@@ -76,33 +76,35 @@ def calculate_stats(directory, vcs, initial_time, break_time):
 		raise ValueError, "Version control system '%s' is not supported" % vcs
 
 	history = history_func(directory)
-	contributors = {}
+	commits = {}
 
 	# go through history once to extract all contributors
 	for commit in history:
-		contrib = contributors.setdefault(commit.author,
-										  Contributor(commit.author, [], timedelta()))
-		contrib.commits.append(commit)
-
-	contributors = contributors.values()
+		commit_list = commits.setdefault(commit.author, [])
+		commit_list.append(commit)
 
 	# calculate statistics for every contributor
-	for contrib in contributors:
+	contributors = []
+	for author, commits in commits.iteritems():
+		total_time = timedelta()
+
+		commit_iter = iter(commits)
 		in_session = False
-		commit_iter = iter(contrib.commits)
 		while True:
 			commit = next(commit_iter, None)
 			if not commit:	break
 			if in_session:
-				interval = commit.time - last_commit_time
+				interval = last_commit_time - commit.time
 				if interval > break_time:	# break (end of coding session)
 					in_session = False
 					continue
-				commit.total_time += interval
+				total_time += interval
 			else:	# new coding session
 				in_session = True
-				contrib.total_time += initial_time
+				total_time += initial_time
 			last_commit_time = commit.time
+
+		contributors.append(Contributor(author, commits, total_time))		
 
 	return contributors
 
