@@ -34,7 +34,7 @@ def create_argument_parser():
     parser = argparse.ArgumentParser(description="Calculate time spent coding by using commit timestamps",
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     
-    minutes = lambda m: timedelta(minutes=m)
+    minutes = lambda m: timedelta(minutes=int(m))
 
     parser.add_argument('directory', type=str, default='.',
                         help="Directory where the repository is contained     (. by default)",
