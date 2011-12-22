@@ -34,9 +34,9 @@ def create_argument_parser():
 	
 	minutes = lambda m: timedelta(minutes=m)
 
-	parser.add_argument('dir', type=str, default='.',
+	parser.add_argument('directory', type=str, default='.',
 						help="Directory where the repository is contained (. by default)",
-						metavar="DIRECTORY", dest='directory')
+						metavar="DIRECTORY")
 	parser.add_argument('--repo', type=str, default=None, choices=SUPPORTED_VCS,
 						help="Repository type for which the stats should be generated",
 						metavar="TYPE", dest='vcs')
@@ -81,7 +81,7 @@ def calculate_stats(directory, vcs, initial_time, break_time):
 	# go through history once to extract all contributors
 	for commit in history:
 		contrib = contributors.setdefault(commit.author,
-										  Contributor(commit.author, [], timedelta
+										  Contributor(commit.author, [], timedelta))
 		contrib.commits.append(commit)
 
 	contributors = contributors.values()
@@ -122,7 +122,7 @@ def git_history(path):
 	log = exec_command(git_log)
 
 	history = []
-	for line in log.splitlines();
+	for line in log.splitlines():
 		commit_hash, timestamp, author, message = line.split(sep)
 		time = datetime.fromtimestamp(timestamp)
 		history.append(Commit(commit_hash, time, author, message))
