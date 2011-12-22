@@ -11,9 +11,9 @@ __version__ = "0.1"
 
 from datetime import datetime, timedelta
 from collections import namedtuple
+from subprocess import Popen, PIPE
 import argparse
 import os
-import subprocess
 
 
 ### Main function
@@ -35,7 +35,7 @@ def create_argument_parser():
 	minutes = lambda m: timedelta(minutes=m)
 
 	parser.add_argument('directory', type=str, default='.',
-						help="Directory where the repository is contained (. by default)",
+						help="Directory where the repository is contained 	(. by default)",
 						metavar="DIRECTORY")
 	parser.add_argument('--repo', type=str, default=None, choices=SUPPORTED_VCS,
 						help="Repository type for which the stats should be generated",
@@ -71,7 +71,7 @@ def calculate_stats(directory, vcs, initial_time, break_time):
 	''' Calculates statistics for given repository.
 	@return: List of Contributor tuples
 	'''
-	history_func = locals().get(vcs + '_history')
+	history_func = globals().get(vcs + '_history')
 	if not history_func:
 		raise ValueError, "Version control system '%s' is not supported" % vcs
 
@@ -81,7 +81,7 @@ def calculate_stats(directory, vcs, initial_time, break_time):
 	# go through history once to extract all contributors
 	for commit in history:
 		contrib = contributors.setdefault(commit.author,
-										  Contributor(commit.author, [], timedelta))
+										  Contributor(commit.author, [], timedelta()))
 		contrib.commits.append(commit)
 
 	contributors = contributors.values()
@@ -91,7 +91,7 @@ def calculate_stats(directory, vcs, initial_time, break_time):
 		in_session = False
 		commit_iter = iter(contrib.commits)
 		while True:
-			commit = commit_iter.next(None)
+			commit = next(commit_iter, None)
 			if not commit:	break
 			if in_session:
 				interval = commit.time - last_commit_time
@@ -124,7 +124,7 @@ def git_history(path):
 	history = []
 	for line in log.splitlines():
 		commit_hash, timestamp, author, message = line.split(sep)
-		time = datetime.fromtimestamp(timestamp)
+		time = datetime.fromtimestamp(float(timestamp))
 		history.append(Commit(commit_hash, time, author, message))
 
 	return history
@@ -135,7 +135,7 @@ def git_history(path):
 
 def exec_command(cmd):
 	''' Executes given shell command and returns its stdout as string. '''
-	cmd_out = subprocess.Popen(cmd, shell=True, stdout=PIPE).stdout
+	cmd_out = Popen(cmd, shell=True, stdout=PIPE).stdout
 	return cmd_out.read()
 
 
