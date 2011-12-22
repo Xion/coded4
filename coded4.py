@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 '''
 coded4
 Calculates time spent on coding based on commit timestamps
