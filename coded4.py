@@ -25,7 +25,7 @@ def main():
 	if args:
 		vcs = args.vcs or detect_vcs(args.directory)
 		contributors = calculate_stats(args.directory, vcs, args.initial_time, args.break_time)
-		print_stats(contributors)
+		print format_stats(contributors, output=dicts_to_table)
 
 
 def create_argument_parser():
@@ -108,10 +108,36 @@ def calculate_stats(directory, vcs, initial_time, break_time):
 
 	return contributors
 
-def print_stats(contributors):
-	# temporary
-	for contrib in contributors:
-		print contrib
+def format_stats(contributors, output=str):
+	''' Formats the statistics using the specified output method. '''
+	stats = [dict(name=c.name, commits=len(c.commits), time="%s secs" % c.total_time.total_seconds())
+			 for c in contributors]
+	if output:
+		if callable(output):	return output(stats)
+		else:					return output.dumps(stats)
+	return stats
+
+def dicts_to_table(dicts):
+	''' Pretty prints the list of dictionaries as a table. '''
+	if not dicts:	return ''
+	lines  = []
+
+	labels = dicts[0].keys()
+	max_col_lens = [max(map(len, [str(d[key]) for d in dicts] + labels))
+					for key in labels]
+	max_row_len = sum(max_col_lens) + (len(labels) - 1)
+
+	# format header
+	lines.append(str.join(' ', (label.ljust(col_len)
+								for label, col_len in zip(labels, max_col_lens))))
+	lines.append('-' * max_row_len)
+
+	# format rows
+	for d in dicts:
+		lines.append(str.join(' ', (str(d[key]).ljust(col_len)
+									for key, col_len in zip(labels, max_col_lens))))
+
+	return str.join('\n', lines)
 
 
 ### Git support
