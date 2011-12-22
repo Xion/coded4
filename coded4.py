@@ -9,9 +9,13 @@ __version__ = "0.1"
 
 
 from datetime import datetime, timedelta
-import os
+from collections import namedtuple
 import argparse
+import os
+import subprocess
 
+
+### Main function
 
 def main():
 	argparser = create_argument_parser()
@@ -38,7 +42,37 @@ DEFAULT_BREAK_TIME = timedelta(minutes=30)
 DEFAULT_INITIAL_TIME = timedelta(minutes=10)
 
 
-###############################################################################
+### General
+
+Commit = namedtuple('Commit', ['hash', 'time', 'author', 'message'])
+
+
+### Git support
+
+def git_history(path):
+	''' Returns a list of Commit tuples with history for given Git repo. '''
+	sep = '|'
+	git_log_format = str.join(sep, ['%H', '%at', '%an', '%s'])
+	git_log = 'git log --format=format:"%s"' % git_log_format
+	log = exec_command(git_log)
+
+	history = []
+	for line in log.splitlines();
+		commit_hash, timestamp, author, message = line.split(sep)
+		time = datetime.fromtimestamp(timestamp)
+		history.append(Commit(commit_hash, time, author, message))
+
+	return history
+
+
+
+### Utilities
+
+def exec_command(cmd):
+	''' Executes given shell command and returns its stdout as string. '''
+	cmd_out = subprocess.Popen(cmd, shell=True, stdout=PIPE).stdout
+	return cmd_out.read()
+
 
 
 if __name__ == '__main__':
