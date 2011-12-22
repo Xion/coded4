@@ -10,7 +10,7 @@ __version__ = "0.2"
 
 
 from datetime import datetime, timedelta
-from collections import namedtuple
+from collections import namedtuple, OrderedDict
 from subprocess import Popen, PIPE
 import argparse
 import os
@@ -115,11 +115,11 @@ def calculate_stats(directory, vcs, initial_time, break_time):
 
 def format_stats(contributors, output=str):
     ''' Formats the statistics using the specified output method. '''
-    stats = [dict(name=c.name, commits=len(c.commits), time=c.total_time)
+    stats = [OrderedDict([('name', c.name), ('commits', len(c.commits)), ('time', c.total_time)])
              for c in contributors]
     if output:
         if callable(output):    return output(stats)
-        else:                   return output.dumps(stats)
+        else:                   return output.dumps(stats, default=timedelta_to_str)
     return stats
 
 def dicts_to_table(dicts):
@@ -179,7 +179,7 @@ def timedelta_to_str(td):
 
     parts = (str(x).rjust(2, '0') for x in (hours, minutes, seconds))
     res += str.join(":", parts)
-    
+
     return res
 
 def exec_command(cmd, workdir=None):
