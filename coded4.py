@@ -115,20 +115,23 @@ def calculate_stats(directory, vcs, initial_time, break_time):
 
 def format_stats(contributors, output=str):
     ''' Formats the statistics using the specified output method. '''
-    stats = [dict(name=c.name, commits=len(c.commits), time="%s secs" % c.total_time.total_seconds())
+    stats = [dict(name=c.name, commits=len(c.commits), time=c.total_time)
              for c in contributors]
     if output:
         if callable(output):    return output(stats)
-        else:                    return output.dumps(stats)
+        else:                   return output.dumps(stats)
     return stats
 
 def dicts_to_table(dicts):
     ''' Pretty prints the list of dictionaries as a table. '''
     if not dicts:    return ''
+
     lines  = []
+    to_str = (lambda obj: timedelta_to_str(obj)
+                          if isinstance(obj, timedelta) else str(obj))
 
     labels = dicts[0].keys()
-    max_col_lens = [max(map(len, [str(d[key]) for d in dicts] + labels))
+    max_col_lens = [max(map(len, [to_str(d[key]) for d in dicts] + labels))
                     for key in labels]
     max_row_len = sum(max_col_lens) + (len(labels) - 1)
 
@@ -139,7 +142,7 @@ def dicts_to_table(dicts):
 
     # format rows
     for d in dicts:
-        lines.append(str.join(' ', (str(d[key]).ljust(col_len)
+        lines.append(str.join(' ', (to_str(d[key]).ljust(col_len)
                                     for key, col_len in zip(labels, max_col_lens))))
 
     return str.join('\n', lines)
@@ -163,8 +166,21 @@ def git_history(path):
     return history
 
 
-
 ### Utilities
+
+def timedelta_to_str(td):
+    ''' Converts timedelta into nice, user-readable string. '''
+    res = ''
+    if td.days > 0: res += str(td.days) + "d "
+
+    seconds = td.seconds
+    hours = seconds / 3600  ; seconds -= hours * 3600
+    minutes = seconds / 60  ; seconds -= minutes * 60
+
+    parts = (str(x).rjust(2, '0') for x in (hours, minutes, seconds))
+    res += str.join(":", parts)
+    
+    return res
 
 def exec_command(cmd, workdir=None):
     ''' Executes given shell command and returns its stdout as string.
