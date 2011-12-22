@@ -106,7 +106,9 @@ def calculate_stats(directory, vcs, initial_time, break_time):
 	return contributors
 
 def print_stats(contributors):
-	pass
+	# temporary
+	for contrib in contributors:
+		print contrib
 
 
 ### Git support
