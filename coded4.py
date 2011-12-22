@@ -21,6 +21,11 @@ def main():
 	argparser = create_argument_parser()
 	args = argparser.parse_args()
 
+	if args:
+		repo = args.repo or detect_repository(args.directory)
+		contributors = calculate_stats(args.directory, repo, args.initial_time, args.break_time)
+		print_stats(contributors)
+
 
 def create_argument_parser():
 	parser = argparse.ArgumentParser(description="Calculate time spent coding by using commit timestamps",
@@ -28,16 +33,23 @@ def create_argument_parser():
 	
 	minutes = lambda m: timedelta(minutes=m)
 
-	parser.add_argument('dir', metavar="DIRECTORY", type=str, default='.',
-						help="Directory where the repository is contained (. by default)")
-	parser.add_argument('--break', metavar="MINUTES", type=minutes, default=DEFAULT_BREAK_TIME,
-						help="Maximum time between commits which are still considered a single coding session")
-	parser.add_argument('--initial', metavar="MINUTES", type=minutes, default=DEFAULT_INITIAL_TIME,
-						help="Time before first commit within a coding session")
+	parser.add_argument('dir', type=str, default='.',
+						help="Directory where the repository is contained (. by default)",
+						metavar="DIRECTORY", dest='directory')
+	parser.add_argument('--repo', type=str, default=None, choices=SUPPORTED_VCS,
+						help="Repository type for which the stats should be generated",
+						metavar="TYPE", dest='vcs')
+	parser.add_argument('--break', type=minutes, default=DEFAULT_BREAK_TIME,
+						help="Maximum time between commits which are still considered a single coding session",
+						metavar="MINUTES", dest='break_time')
+	parser.add_argument('--initial', type=minutes, default=DEFAULT_INITIAL_TIME,
+						help="Time before first commit within a coding session",
+						metavar="MINUTES", dest='initial_time')
 
 	return parser
 
 
+SUPPORTED_VCS = ['git']
 DEFAULT_BREAK_TIME = timedelta(minutes=30)
 DEFAULT_INITIAL_TIME = timedelta(minutes=10)
 
@@ -45,6 +57,16 @@ DEFAULT_INITIAL_TIME = timedelta(minutes=10)
 ### General
 
 Commit = namedtuple('Commit', ['hash', 'time', 'author', 'message'])
+Contributor = namedtuple('Contributor', ['name', 'commits_count', 'total_time'])
+
+def detect_repository(directory):
+	pass
+
+def calculate_stats(directory, repo, initial_time, break_time):
+	pass
+
+def print_stats(contributors):
+	pass
 
 
 ### Git support
