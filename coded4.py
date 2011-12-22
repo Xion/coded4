@@ -6,7 +6,7 @@ Calculates time spent on coding based on commit timestamps
 
 __author__ = 'Karol Kuczmarski "Xion"'
 __license__ = "MIT"
-__version__ = "0.1"
+__version__ = "0.2"
 
 
 from datetime import datetime, timedelta
@@ -25,7 +25,9 @@ def main():
 	if args:
 		vcs = args.vcs or detect_vcs(args.directory)
 		contributors = calculate_stats(args.directory, vcs, args.initial_time, args.break_time)
-		print format_stats(contributors, output=dicts_to_table)
+
+		output = dicts_to_table if args.output == 'table' else __import__(args.output)
+		print format_stats(contributors, output)
 
 
 def create_argument_parser():
@@ -37,15 +39,18 @@ def create_argument_parser():
 	parser.add_argument('directory', type=str, default='.',
 						help="Directory where the repository is contained 	(. by default)",
 						metavar="DIRECTORY")
-	parser.add_argument('--repo', type=str, default=None, choices=SUPPORTED_VCS,
+	parser.add_argument('--repo', '-r', type=str, default=None, choices=SUPPORTED_VCS,
 						help="Repository type for which the stats should be generated",
 						metavar="TYPE", dest='vcs')
-	parser.add_argument('--break', type=minutes, default=DEFAULT_BREAK_TIME,
+	parser.add_argument('--break', '-b', type=minutes, default=DEFAULT_BREAK_TIME,
 						help="Maximum time between commits which are still considered a single coding session",
 						metavar="MINUTES", dest='break_time')
-	parser.add_argument('--initial', type=minutes, default=DEFAULT_INITIAL_TIME,
+	parser.add_argument('--initial', '-i', type=minutes, default=DEFAULT_INITIAL_TIME,
 						help="Time before first commit within a coding session",
 						metavar="MINUTES", dest='initial_time')
+	parser.add_argument('--format', '-f', type=str, default='table', choices=['table', 'json'],
+						help="Output format (formatted table by default)",
+						metavar="FORMAT", dest='output')
 
 	return parser
 
@@ -147,8 +152,7 @@ def git_history(path):
 	sep = '|'
 	git_log_format = str.join(sep, ['%H', '%at', '%an', '%s'])
 	git_log = 'git log --format=format:"%s"' % git_log_format
-
-	log = exec_command('cd %s && %s' % (path, git_log))
+	log = exec_command(git_log, path)
 
 	history = []
 	for line in log.splitlines():
@@ -162,9 +166,11 @@ def git_history(path):
 
 ### Utilities
 
-def exec_command(cmd):
-	''' Executes given shell command and returns its stdout as string. '''
-	cmd_out = Popen(cmd, shell=True, stdout=PIPE).stdout
+def exec_command(cmd, workdir=None):
+	''' Executes given shell command and returns its stdout as string.
+	@param workdir: Working directory for the command
+	'''
+	cmd_out = Popen(cmd, shell=True, cwd=workdir, stdout=PIPE).stdout
 	return cmd_out.read()
 
 
