@@ -1,0 +1,33 @@
+# coded4
+
+Ever wondered how much time did you spend on some project?...
+
+_coded4_ ('coded for ...') calculates approximate time that one has spent coding
+particular project. It does so by using commit timestamps and reconstructing
+coding sessions for every commiter in given Git repository.
+
+## Usage
+
+    $ ./coded4.py <directory>
+
+For example, you can find out how much time was spent on this very project:
+
+    $ git clone git://github.com/Xion/coded4.git
+    $ cd coded4
+    $ ./coded4.py .
+
+This should print something like that:
+
+    commits name             time       
+	------------------------------------
+	13      Karol Kuczmarski 4123.0 secs
+
+As you can see, _coded4_ didn't take all that long to make ;)
+
+For more options:
+
+    $ ./coded4.py --help
+
+---
+
+This tiny project is licensed under MIT.
