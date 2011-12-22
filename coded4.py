@@ -147,7 +147,8 @@ def git_history(path):
 	sep = '|'
 	git_log_format = str.join(sep, ['%H', '%at', '%an', '%s'])
 	git_log = 'git log --format=format:"%s"' % git_log_format
-	log = exec_command(git_log)
+
+	log = exec_command('cd %s && %s' % (path, git_log))
 
 	history = []
 	for line in log.splitlines():
