@@ -22,8 +22,8 @@ def main():
 	args = argparser.parse_args()
 
 	if args:
-		repo = args.repo or detect_repository(args.directory)
-		contributors = calculate_stats(args.directory, repo, args.initial_time, args.break_time)
+		vcs = args.vcs or detect_vcs(args.directory)
+		contributors = calculate_stats(args.directory, vcs, args.initial_time, args.break_time)
 		print_stats(contributors)
 
 
@@ -57,13 +57,53 @@ DEFAULT_INITIAL_TIME = timedelta(minutes=10)
 ### General
 
 Commit = namedtuple('Commit', ['hash', 'time', 'author', 'message'])
-Contributor = namedtuple('Contributor', ['name', 'commits_count', 'total_time'])
+Contributor = namedtuple('Contributor', ['name', 'commits', 'total_time'])
 
-def detect_repository(directory):
-	pass
+def detect_vcs(directory):
+	''' Checks which of the supported VCS has repo in given directory. '''
+	for vcs in SUPPORTED_VCS:
+		vcs_dir = os.path.join(directory, '.' + vcs)
+		if os.path.isdir(vcs_dir):
+			return vcs
 
-def calculate_stats(directory, repo, initial_time, break_time):
-	pass
+def calculate_stats(directory, vcs, initial_time, break_time):
+	''' Calculates statistics for given repository.
+	@return: List of Contributor tuples
+	'''
+	history_func = locals().get(vcs + '_history')
+	if not history_func:
+		raise ValueError, "Version control system '%s' is not supported" % vcs
+
+	history = history_func(directory)
+	contributors = {}
+
+	# go through history once to extract all contributors
+	for commit in history:
+		contrib = contributors.setdefault(commit.author,
+										  Contributor(commit.author, [], timedelta
+		contrib.commits.append(commit)
+
+	contributors = contributors.values()
+
+	# calculate statistics for every contributor
+	for contrib in contributors:
+		in_session = False
+		commit_iter = iter(contrib.commits)
+		while True:
+			commit = commit_iter.next(None)
+			if not commit:	break
+			if in_session:
+				interval = commit.time - last_commit_time
+				if interval > break_time:	# break (end of coding session)
+					in_session = False
+					continue
+				commit.total_time += interval
+			else:	# new coding session
+				in_session = True
+				contrib.total_time += initial_time
+			last_commit_time = commit.time
+
+	return contributors
 
 def print_stats(contributors):
 	pass
