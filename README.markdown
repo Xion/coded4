@@ -4,7 +4,7 @@ Ever wondered how much time have you spent on a project?...
 
 _coded4_ ('coded for ...') calculates approximate time that one has spent coding
 particular project. It uses commit timestamps to reconstruct coding sessions
-for every commiter in given Git repository.
+for every commiter in given Git or Hg repository.
 
 ## Usage
 
@@ -20,9 +20,9 @@ For example, you can find out how much time was spent on this very project:
 
 This should print something like that:
 
-    commits name             time       
-    ------------------------------------
-    13      Karol Kuczmarski 4123.0 secs
+    name             commits time    
+    ---------------------------------
+    Karol Kuczmarski 21      02:16:19
 
 As you can see, _coded4_ didn't take all that long to make ;)
 
