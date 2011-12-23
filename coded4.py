@@ -166,6 +166,24 @@ def git_history(path):
     return history
 
 
+### Hg support
+
+def hg_history(path):
+    ''' Returns a list of Commit tuples with history for given Mercurial repo. '''
+    sep = '|'
+    hg_log_template = str.join(sep, ['{node}', '{date|isodate}', '{author|person}', '{desc|firstline}'])
+    hg_log = r'hg log --template "%s\n"' % hg_log_template
+    log = exec_command(hg_log, path)
+
+    history = []
+    for line in log.splitlines():
+        commit_hash, iso_time, author, message = line.split(sep)
+        time = datetime(iso_time)
+        history.append(Commit(commit_hash, time, author, message))
+
+    return history
+
+
 ### Utilities
 
 def timedelta_to_str(td):
