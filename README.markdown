@@ -1,12 +1,14 @@
 # coded4
 
-Ever wondered how much time did you spend on some project?...
+Ever wondered how much time have you spent on a project?...
 
 _coded4_ ('coded for ...') calculates approximate time that one has spent coding
-particular project. It uses commit timestamps to reconstruct
-coding sessions for every commiter in given Git repository.
+particular project. It uses commit timestamps to reconstruct coding sessions
+for every commiter in given Git repository.
 
 ## Usage
+
+...is simple:
 
     $ ./coded4.py <directory>
 
