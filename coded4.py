@@ -55,7 +55,7 @@ def create_argument_parser():
     return parser
 
 
-SUPPORTED_VCS = ['git']
+SUPPORTED_VCS = ['git', 'hg']
 DEFAULT_BREAK_TIME = timedelta(minutes=30)
 DEFAULT_INITIAL_TIME = timedelta(minutes=10)
 
@@ -171,14 +171,15 @@ def git_history(path):
 def hg_history(path):
     ''' Returns a list of Commit tuples with history for given Mercurial repo. '''
     sep = '|'
-    hg_log_template = str.join(sep, ['{node}', '{date|isodate}', '{author|person}', '{desc|firstline}'])
+    hg_log_template = str.join(sep, ['{node}', '{date|hgdate}', '{author|person}', '{desc|firstline}'])
     hg_log = r'hg log --template "%s\n"' % hg_log_template
     log = exec_command(hg_log, path)
 
     history = []
     for line in log.splitlines():
-        commit_hash, iso_time, author, message = line.split(sep)
-        time = datetime(iso_time)
+        commit_hash, hg_time, author, message = line.split(sep)
+        hg_time = reduce(int.__add__, map(int, hg_time.split()), 0)  # hg_time is 'local_timestamp timezone_offset'
+        time = datetime.fromtimestamp(hg_time)
         history.append(Commit(commit_hash, time, author, message))
 
     return history
