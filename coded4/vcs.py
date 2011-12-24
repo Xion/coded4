@@ -9,6 +9,22 @@ import os
 
 SUPPORTED_VCS = ['git', 'hg']
 
+
+def retrieve_commit_history(directory, vcs_name=None):
+    ''' Retrieves history of commit for given repository.
+    @return: List of Commit tuples
+    '''
+    vcs_name = vcs_name or detect_vcs(directory)
+    if not vcs_name:
+        raise ValueError, "Could not find any known version control system in given directory"
+
+    history_func = globals().get(vcs_name + '_history')
+    if not history_func:
+        raise ValueError, "Version control system '%s' is not supported" % vcs_name
+
+    history = history_func(directory)
+    return sorted(history, key=lambda c: c.time, reverse=True)
+
 def detect_vcs(directory):
     ''' Checks which of the supported VCS has repo in given directory.
     @return: Name of version control system found in given directory

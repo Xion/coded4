@@ -4,7 +4,7 @@ Executable script.
 '''
 from __future__ import unicode_literals
 
-from vcs import SUPPORTED_VCS, detect_vcs
+import vcs
 import stats
 from output import format_stats, dicts_to_table
 from datetime import timedelta
@@ -30,22 +30,22 @@ def create_argument_parser():
     parser.add_argument('directory', type=str, default='.',
                         help="Directory where the repository is contained     (. by default)",
                         metavar="DIRECTORY")
-    parser.add_argument('--repo', '-r', type=str, default=None, choices=SUPPORTED_VCS,
+    parser.add_argument('--repo', '-r', type=str, default=None, choices=vcs.SUPPORTED_VCS,
                         help="Repository type for which the stats should be generated",
                         metavar="TYPE", dest='vcs')
-    parser.add_argument('--algorithm', '--algo', '-a', default='simple', choices=CLUSTERING_ALGORITHMS,
-                        help="What algorithm should be used to approximate coding sessions",
-                        metavar="ALGO", dest='algorithm')
+    parser.add_argument('--cluster-algo', '-c', default='simple', choices=CLUSTERING_ALGORITHMS,
+                        help="What algorithm should be used to cluster individual commits into coding sessions",
+                        metavar="ALGO", dest='cluster_algo')
     parser.add_argument('--format', '-f', type=str, default='table', choices=OUTPUT_FORMATS,
                         help="Output format (formatted table by default)",
                         metavar="FORMAT", dest='output')
 
     minutes = lambda m: timedelta(minutes=int(m))
 
-    # add arguments for clustering algorithms
+    # add arguments for algorithms
     parser.add_argument('--break', '-b', type=minutes, default=DEFAULT_BREAK_TIME,
                         help="Maximum time between commits which are still considered a single coding session",
-                        metavar="MINUTES", dest='break_time')
+                        metavar="MINUTES", dest='epsilon')
     parser.add_argument('--initial', '-i', type=minutes, default=DEFAULT_INITIAL_TIME,
                         help="Time before first commit within a coding session",
                         metavar="MINUTES", dest='initial_time')
@@ -53,7 +53,7 @@ def create_argument_parser():
     return parser
 
 
-CLUSTERING_ALGORITHMS = ['simple', 'dbscan']
+CLUSTERING_ALGORITHMS = ['simple']
 OUTPUT_FORMATS = ['table', 'json']
 
 DEFAULT_BREAK_TIME = timedelta(minutes=30)
@@ -66,11 +66,9 @@ def calculate_statistics(args):
     ''' Calculates statistics, as dictated by command line args.
     @return: List of Contributor tuples
     '''
-    vcs_name = args.vcs or detect_vcs(args.directory)
-
-    commit_history = stats.retrieve_commit_history(args.directory, vcs_name)
+    commit_history = vcs.retrieve_commit_history(args.directory, args.vcs)
     grouped_commits = stats.group_by_contributors(commit_history)
-    coding_sessions = stats.cluster_commits(grouped_commits, args.algorithm, args.break_time)
+    coding_sessions = stats.cluster_commits(grouped_commits, args.cluster_algo, args.epsilon)
     contributors = stats.compute_time_stats(coding_sessions, args.initial_time)
 
     return sorted(contributors, key = lambda c: len(c.commits), reverse=True)

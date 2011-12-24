@@ -10,16 +10,6 @@ import vcs
 Contributor = namedtuple('Contributor', ['name', 'commits', 'total_time'])
 
 
-def retrieve_commit_history(directory, vcs_name):
-    ''' Retrieves history of commit for given repository.
-    @return: List of Commit tuples
-    '''
-    history_func = getattr(vcs, vcs_name + '_history', None)
-    if not history_func:
-        raise ValueError, "Version control system '%s' is not supported" % vcs_name
-
-    history = history_func(directory)
-    return sorted(history, key=lambda c: c.time, reverse=True)
 
 def group_by_contributors(commit_history):
     ''' Goes through commit history and groups commits by their authors.
