@@ -2,6 +2,7 @@
 Code for calculating statistics based on commit history.
 '''
 from collections import namedtuple
+from itertools import chain
 from datetime import timedelta
 import vcs
 
@@ -32,29 +33,43 @@ def group_by_contributors(commit_history):
 
     return commits
 
-def compute_time_stats(grouped_commits, cluster_algo, break_time, initial_time):
-    ''' Calculates commit statistics for every contributor.
+def cluster_commits(grouped_commits, cluster_algo, epsilon):
+    ''' Clusters commits for every contributor in given dictionary. 
     @param grouped_commits: Dictionary mapping contributor names to lists of Commit tuples
     @param cluster_algo: Name of clustering algorithm
-    @return: List of Contributor tuples
+    @param epsilon: Temporal distance for the epsilon-neighborhood
+    @return: Dictionary mapping author names to lists of coding sessions
     '''
     cluster_func = globals().get(cluster_algo + '_clustering')
     if not cluster_func:
         raise ValueError, "Unknown clustering algorithm '%s'" % cluster_algo
 
-    contributors = []
+    clustered = {}
     for author, commits in grouped_commits.iteritems():
+        sessions = cluster_func(commits, epsilon)
+        clustered[author] = sessions
+
+    return clustered
+
+def compute_time_stats(coding_sessions, initial_time):
+    ''' Calculates time statistics, given list of coding sessions for every contributor.
+    @param coding_sessions: Dictionary mapping contributor names to lists of coding sessions
+    @return: List of Contributor tuples
+    '''
+    contributors = []
+    for author, sessions in coding_sessions.iteritems():
         total_time = timedelta()
-        sessions = cluster_func(commits, break_time)
         for s in sessions:
             total_time += initial_time
             total_time += s[0].time - s[-1].time
 
         # TODO; Contributor could store list of sessions rather than flat list of commits
         # so that we could extract even more interesting stats (e.g. longest/shortest/average session)
+        commits = list(chain(*sessions))
         contributors.append(Contributor(author, commits, total_time))        
 
     return contributors
+
 
 def calculate_totals(contributors):
     ''' Given list of contributors, calculates aggregate statistics.

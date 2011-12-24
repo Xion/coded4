@@ -5,7 +5,7 @@ Executable script.
 from __future__ import unicode_literals
 
 from vcs import SUPPORTED_VCS, detect_vcs
-from stats import retrieve_commit_history, group_by_contributors, compute_time_stats
+import stats
 from output import format_stats, dicts_to_table
 from datetime import timedelta
 import argparse
@@ -17,17 +17,9 @@ def main():
     args = argparser.parse_args()
 
     if args:
-        vcs_name = args.vcs or detect_vcs(args.directory)
-
-        # calculate statistics
-        commit_history = retrieve_commit_history(args.directory, vcs_name)
-        grouped_commits = group_by_contributors(commit_history)
-        stats = compute_time_stats(grouped_commits, args.algorithm, args.break_time, args.initial_time)
-
-        stats = sorted(stats, key = lambda c: len(c.commits), reverse=True)
-
+        contributors = calculate_statistics(args)
         output = dicts_to_table if args.output == 'table' else __import__(args.output)
-        print format_stats(stats, output)
+        print format_stats(contributors, output)
 
 
 def create_argument_parser():
@@ -67,6 +59,21 @@ OUTPUT_FORMATS = ['table', 'json']
 DEFAULT_BREAK_TIME = timedelta(minutes=30)
 DEFAULT_INITIAL_TIME = timedelta(minutes=5)
 
+
+### Logic
+
+def calculate_statistics(args):
+    ''' Calculates statistics, as dictated by command line args.
+    @return: List of Contributor tuples
+    '''
+    vcs_name = args.vcs or detect_vcs(args.directory)
+
+    commit_history = stats.retrieve_commit_history(args.directory, vcs_name)
+    grouped_commits = stats.group_by_contributors(commit_history)
+    coding_sessions = stats.cluster_commits(grouped_commits, args.algorithm, args.break_time)
+    contributors = stats.compute_time_stats(coding_sessions, args.initial_time)
+
+    return sorted(contributors, key = lambda c: len(c.commits), reverse=True)
 
 
 if __name__ == '__main__':
