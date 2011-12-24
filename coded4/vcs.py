@@ -33,7 +33,8 @@ def git_history(path):
 
     history = []
     for line in log.splitlines():
-        commit_hash, timestamp, author, message = line.split(sep)
+        print line
+        commit_hash, timestamp, author, message = line.split(sep, 3)
         time = datetime.fromtimestamp(float(timestamp))
         history.append(Commit(commit_hash, time, author, message))
 
@@ -51,7 +52,7 @@ def hg_history(path):
 
     history = []
     for line in log.splitlines():
-        commit_hash, hg_time, author, message = line.split(sep)
+        commit_hash, hg_time, author, message = line.split(sep, 3)
         hg_time = reduce(int.__add__, map(int, hg_time.split()), 0)  # hg_time is 'local_timestamp timezone_offset'
         time = datetime.fromtimestamp(hg_time)
         history.append(Commit(commit_hash, time, author, message))
