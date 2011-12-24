@@ -19,7 +19,7 @@ def main():
     if args:
         vcs_name = args.vcs or detect_vcs(args.directory)
 
-        contributors = calculate_stats(args.directory, vcs_name, args.initial_time, args.break_time)
+        contributors = calculate_stats(args.directory, vcs_name, args.algorithm, args.initial_time, args.break_time)
         contributors = sorted(contributors, key = lambda c: len(c.commits), reverse=True)
 
         output = dicts_to_table if args.output == 'table' else __import__(args.output)
@@ -61,7 +61,7 @@ CLUSTERING_ALGORITHMS = ['simple', 'dbscan']
 OUTPUT_FORMATS = ['table', 'json']
 
 DEFAULT_BREAK_TIME = timedelta(minutes=30)
-DEFAULT_INITIAL_TIME = timedelta(minutes=10)
+DEFAULT_INITIAL_TIME = timedelta(minutes=5)
 
 
 
