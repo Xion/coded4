@@ -49,7 +49,7 @@ def dicts_to_table(dicts):
 def timedelta_to_str(td):
     ''' Converts timedelta into nice, user-readable string. '''
     res = ''
-    if td.days > 0: res += str(td.days) + "d "
+    if td.days != 0: res += str(td.days) + "d "
 
     seconds = td.seconds
     hours = seconds / 3600  ; seconds -= hours * 3600

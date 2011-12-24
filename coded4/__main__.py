@@ -2,6 +2,8 @@
 '''
 Executable script.
 '''
+from __future__ import unicode_literals
+
 from vcs import SUPPORTED_VCS, detect_vcs
 from stats import calculate_stats
 from output import format_stats, dicts_to_table

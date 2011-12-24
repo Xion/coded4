@@ -21,7 +21,7 @@ def calculate_stats(directory, vcs_name, initial_time, break_time):
     commits = {}
 
     # go through history once to extract all contributors
-    for commit in history:
+    for commit in sorted(history, key=lambda c: c.time, reverse=True):
         commit_list = commits.setdefault(commit.author, [])
         commit_list.append(commit)
 
@@ -64,4 +64,5 @@ def calculate_totals(contributors):
             attr, _ = measures[i]
             sums[i] += getattr(c, attr)
 
+    print sums[1]
     return Contributor("(total)", *sums)
