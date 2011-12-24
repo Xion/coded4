@@ -33,7 +33,6 @@ def git_history(path):
 
     history = []
     for line in log.splitlines():
-        print line
         commit_hash, timestamp, author, message = line.split(sep, 3)
         time = datetime.fromtimestamp(float(timestamp))
         history.append(Commit(commit_hash, time, author, message))
