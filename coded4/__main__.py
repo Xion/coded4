@@ -5,7 +5,7 @@ Executable script.
 from __future__ import unicode_literals
 
 from vcs import SUPPORTED_VCS, detect_vcs
-from stats import calculate_stats
+from stats import retrieve_commit_history, group_by_contributors, compute_time_stats
 from output import format_stats, dicts_to_table
 from datetime import timedelta
 import argparse
@@ -19,11 +19,15 @@ def main():
     if args:
         vcs_name = args.vcs or detect_vcs(args.directory)
 
-        contributors = calculate_stats(args.directory, vcs_name, args.algorithm, args.initial_time, args.break_time)
-        contributors = sorted(contributors, key = lambda c: len(c.commits), reverse=True)
+        # calculate statistics
+        commit_history = retrieve_commit_history(args.directory, vcs_name)
+        grouped_commits = group_by_contributors(commit_history)
+        stats = compute_time_stats(grouped_commits, args.algorithm, args.break_time, args.initial_time)
+
+        stats = sorted(stats, key = lambda c: len(c.commits), reverse=True)
 
         output = dicts_to_table if args.output == 'table' else __import__(args.output)
-        print format_stats(contributors, output)
+        print format_stats(stats, output)
 
 
 def create_argument_parser():
