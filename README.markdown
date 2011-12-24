@@ -6,17 +6,25 @@ _coded4_ ('coded for ...') calculates approximate time that one has spent coding
 particular project. It uses commit timestamps to reconstruct coding sessions
 for every commiter in given Git or Hg repository.
 
+## Installation
+
+A standard `setup.py` is provided:
+
+    $ git clone git://github.com/Xion/coded4.git
+    $ cd coded4
+    $ ./setup.py develop
+
+Use `develop` instead of `install` so you can easily `git pull` any updates.
+
 ## Usage
 
 ...is simple:
 
-    $ ./coded4.py <directory>
+    $ coded4 <directory-with-repo>
 
-For example, you can find out how much time was spent on this very project:
+For example, if you have just installed _coded4_ and are still inside its directory, type:
 
-    $ git clone git://github.com/Xion/coded4.git
-    $ cd coded4
-    $ ./coded4.py .
+    $ coded4 .
 
 This should print something like that:
 
@@ -28,8 +36,8 @@ As you can see, _coded4_ didn't take all that long to make ;)
 
 For more options:
 
-    $ ./coded4.py --help
+    $ coded4 --help
 
 ---
 
-This tiny project is licensed under MIT.
+This small project is licensed under MIT.
