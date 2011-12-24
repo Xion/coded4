@@ -113,10 +113,30 @@ def calculate_stats(directory, vcs, initial_time, break_time):
 
     return contributors
 
+def calculate_totals(contributors):
+    ''' Given list of contributors, calculates aggregate statistics.
+    @return: Fake Contributor tuple which contains the aggregated stats
+    '''
+    if not contributors:    return
+    measures = [('commits', []), ('total_time', timedelta())]
+
+    sums = [initial for _, initial in measures]
+    for c in contributors:
+        for i in xrange(0, len(measures)):
+            attr, _ = measures[i]
+            sums[i] += getattr(c, attr)
+
+    return Contributor("(total)", *sums)
+
+
+### Formatting & display
+
 def format_stats(contributors, output=str):
     ''' Formats the statistics using the specified output method. '''
+    totals = calculate_totals(contributors)
     stats = [OrderedDict([('name', c.name), ('commits', len(c.commits)), ('time', c.total_time)])
-             for c in contributors]
+             for c in contributors + [totals]]
+
     if output:
         if callable(output):    return output(stats)
         else:                   return output.dumps(stats, default=timedelta_to_str)
@@ -146,6 +166,20 @@ def dicts_to_table(dicts):
                                     for key, col_len in zip(labels, max_col_lens))))
 
     return str.join('\n', lines)
+
+def timedelta_to_str(td):
+    ''' Converts timedelta into nice, user-readable string. '''
+    res = ''
+    if td.days > 0: res += str(td.days) + "d "
+
+    seconds = td.seconds
+    hours = seconds / 3600  ; seconds -= hours * 3600
+    minutes = seconds / 60  ; seconds -= minutes * 60
+
+    parts = (str(x).rjust(2, '0') for x in (hours, minutes, seconds))
+    res += str.join(":", parts)
+
+    return res
 
 
 ### Git support
@@ -186,20 +220,6 @@ def hg_history(path):
 
 
 ### Utilities
-
-def timedelta_to_str(td):
-    ''' Converts timedelta into nice, user-readable string. '''
-    res = ''
-    if td.days > 0: res += str(td.days) + "d "
-
-    seconds = td.seconds
-    hours = seconds / 3600  ; seconds -= hours * 3600
-    minutes = seconds / 60  ; seconds -= minutes * 60
-
-    parts = (str(x).rjust(2, '0') for x in (hours, minutes, seconds))
-    res += str.join(":", parts)
-
-    return res
 
 def exec_command(cmd, workdir=None):
     ''' Executes given shell command and returns its stdout as string.
