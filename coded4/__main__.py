@@ -44,7 +44,7 @@ def create_argument_parser():
                         help="What algorithm should be used to cluster individual commits. "
                         + "Possible values: %(choices)s",
                         metavar="ALGO", dest='cluster_algo')
-    parser.add_argument('--approx-algo', '-a', default='start10', choices=APPROXIMATION_ALGORITHMS,
+    parser.add_argument('--approx-algo', '-a', default='polynomial', choices=APPROXIMATION_ALGORITHMS,
                         help="What algorithms should be used to approximate time spent coding. "
                         + "Possible values: %(choices)s",
                         metavar="ALGO", dest='approx_algo')
