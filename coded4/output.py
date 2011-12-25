@@ -4,44 +4,68 @@ Generating output in various formats.
 from collections import OrderedDict
 from datetime import timedelta
 from stats import calculate_totals
+import os
 
 
-def format_stats(contributors, output=str):
-    ''' Formats the statistics using the specified output method. '''
-    totals = calculate_totals(contributors)
-    stats = [OrderedDict([('name', c.name), ('sessions', len(c.sessions)),
-                          ('commits', sum(len(s.commits) for s in c.sessions)),
-                          ('time', c.total_time)])
-             for c in contributors + [totals]]
+def format_output(repo_dir, contributors, output_format):
+    ''' Formats the output in specified format.
+    @param repo_dir: Path to directory with repo that had its statistics generated
+    @param contributors: List of Contributor tuples
+    @param output_format: Name of output format
+    '''
+    output_func = globals().get('output_' + output_format)
+    if not output_func:
+        raise ValueError, "Unknown or unsupported output format '%s'" % output_format
 
-    if output:
-        if callable(output):    return output(stats)
-        else:                   return output.dumps(stats, default=timedelta_to_str)
-    return stats
+    repo_name = os.path.basename(repo_dir)
+    contribs = map(to_output_dict, contributors)
+    totals = to_output_dict(calculate_totals(contributors))
+    return output_func(repo_name, contribs, totals)
+
+def to_output_dict(contributor):
+    ''' Converts Contributor tuple into output dictionary. '''
+    res = OrderedDict()
+    res['name'] = contributor.name
+    res['sessions'] = len(contributor.sessions)
+    res['commits'] = sum(len(s.commits) for s in contributor.sessions)
+    res['time'] = contributor.total_time
+    return res
 
 
-def dicts_to_table(dicts):
-    ''' Pretty prints the list of dictionaries as a table. '''
-    if not dicts:    return ''
+## Formatting functions
 
-    lines  = []
+def output_table(repo_name, contribs, totals):
+    ''' Outputs the repository statistics as table. '''
+    items = contribs + [totals]
+    if not items:   return ''
+
     to_str = (lambda obj: timedelta_to_str(obj)
                           if isinstance(obj, timedelta) else str(obj))
 
-    labels = dicts[0].keys()
-    max_col_lens = [max(map(len, [to_str(d[key]) for d in dicts] + labels))
+    # do some calculations for cells' dimensions
+    labels = items[0].keys()
+    max_col_lens = [max(map(len, [to_str(item[key]) for item in items] + labels))
                     for key in labels]
     max_row_len = sum(max_col_lens) + (len(labels) - 1)
 
+    def make_row(cell_func):
+        return str.join(' ', (cell_func(label).ljust(col_len)
+                              for label, col_len in zip(labels, max_col_lens)))
+
+    lines = ["Statistics for '%s'" % repo_name, '']
+
     # format header
-    lines.append(str.join(' ', (label.ljust(col_len)
-                                for label, col_len in zip(labels, max_col_lens))))
+    lines.append(make_row(lambda label: label))
     lines.append('-' * max_row_len)
 
-    # format rows
-    for d in dicts:
-        lines.append(str.join(' ', (to_str(d[key]).ljust(col_len)
-                                    for key, col_len in zip(labels, max_col_lens))))
+    # format rows with contributors' stats
+    for c in contribs:
+        row = make_row(lambda key: to_str(c[key]))
+        lines.append(row)
+
+    # format footer with aggregate totals
+    lines.append('-' * max_row_len)
+    lines.append(make_row(lambda key: to_str(totals[key])))
 
     return str.join('\n', lines)
 

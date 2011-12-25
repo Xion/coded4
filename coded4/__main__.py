@@ -8,7 +8,7 @@ import vcs
 import cluster
 import approx
 import stats
-from output import format_stats, dicts_to_table
+from output import format_output
 
 from datetime import timedelta
 import argparse
@@ -21,8 +21,7 @@ def main():
 
     if args:
         contributors = calculate_statistics(args)
-        output = dicts_to_table if args.output == 'table' else __import__(args.output)
-        print format_stats(contributors, output)
+        print format_output(args.directory, contributors, args.output)
 
 
 def create_argument_parser():

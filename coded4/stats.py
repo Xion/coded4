@@ -37,4 +37,4 @@ def calculate_totals(contributors):
             attr, _ = measures[i]
             sums[i] += getattr(c, attr)
 
-    return Contributor("(total)", *sums)
+    return Contributor("TOTAL", *sums)
