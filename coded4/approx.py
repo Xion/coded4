@@ -46,5 +46,30 @@ def ten2five_approximation(commit_cluster):
 	'''
 	if len(commit_cluster) > 1:
 		return Session(commit_cluster, timedelta(minutes=10), timedelta(minutes=5))
-	else:
-		return Session(commit_cluster, timedelta(minutes=5), timedelta())
+	return Session(commit_cluster, timedelta(minutes=5), timedelta())
+
+def quarter_end_approximation(commit_cluster):
+	''' A slightly more sophisticated approximation that uses
+	the average time between commits in a session.
+	'''
+	diffs = commit_time_diff(commit_cluster)
+	if diffs:
+		average_diff = sum(diffs, timedelta()) / len(diffs)
+		before_first = average_diff
+		after_last = average_diff / 4	# quarter end
+		return Session(commit_cluster, before_first, after_last)
+
+	return Session(commit_cluster, timedelta(minutes=5), timedelta())
+
+
+## Utilities
+
+def commit_time_diff(commits):
+	''' Returns time differences between commits. '''
+	if not commits or len(commits) == 1:
+		return []
+
+	diffs = []
+	for i in xrange(0, len(commits) - 1):
+		diffs.append(commits[i].time - commits[i+1].time)
+	return diffs

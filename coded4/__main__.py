@@ -54,13 +54,12 @@ def create_argument_parser():
                         help="Maximum time between commits which are still considered a single coding session",
                         metavar="MINUTES", dest='epsilon')
     
-
     return parser
 
 
-CLUSTERING_ALGORITHMS = ['simple']
-APPROXIMATION_ALGORITHMS = ['start10', 'ten2five']
 OUTPUT_FORMATS = ['table', 'json']
+CLUSTERING_ALGORITHMS = ['simple']
+APPROXIMATION_ALGORITHMS = ['start10', 'ten2five', 'quarter_end']
 
 DEFAULT_EPSILON = timedelta(minutes=30)
 
