@@ -62,9 +62,11 @@ def create_argument_parser():
 OUTPUT_FORMATS = ['table', 'json']
 CLUSTERING_ALGORITHMS = ['simple']
 APPROXIMATION_ALGORITHMS = {
+    'null': "Null approximation (i.e. uses only time between commits), used mostly for testing",
     'start10': "Simple algorithm that adds 10 minutes before first commit",
     'ten2five': "Simple algorithm that adds 10 minutes before first and 5 minutes after last commit",
     'quarter_end': "Uses average time between commits in session, adding 1/4th of it after last commit",
+    'polynomial': "Fits a polynomial into intervals between commits and extrapolates it",
 }
 
 DEFAULT_EPSILON_MINUTES = 30
