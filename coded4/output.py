@@ -9,7 +9,9 @@ from stats import calculate_totals
 def format_stats(contributors, output=str):
     ''' Formats the statistics using the specified output method. '''
     totals = calculate_totals(contributors)
-    stats = [OrderedDict([('name', c.name), ('commits', len(c.commits)), ('time', c.total_time)])
+    stats = [OrderedDict([('name', c.name), ('sessions', len(c.sessions)),
+                          ('commits', sum(len(s.commits) for s in c.sessions)),
+                          ('time', c.total_time)])
              for c in contributors + [totals]]
 
     if output:
