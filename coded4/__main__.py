@@ -31,7 +31,7 @@ def create_argument_parser():
     
     # add general arguments
     parser.add_argument('directory', type=str, default='.',
-                        help="Directory where the repository is contained     (. by default)",
+                        help="Directory where the repository is contained (. by default)",
                         metavar="DIRECTORY")
     parser.add_argument('--repo', '-r', type=str, default=None, choices=vcs.SUPPORTED_VCS,
                         help="Repository type for which the stats should be generated",
@@ -42,16 +42,19 @@ def create_argument_parser():
 
     # add algorithms
     parser.add_argument('--cluster-algo', '-c', default='simple', choices=CLUSTERING_ALGORITHMS,
-                        help="What algorithm should be used to cluster individual commits",
+                        help="What algorithm should be used to cluster individual commits. "
+                        + "Possible values: %(choices)s",
                         metavar="ALGO", dest='cluster_algo')
     parser.add_argument('--approx-algo', '-a', default='start10', choices=APPROXIMATION_ALGORITHMS,
-                        help="What algorithms should be used to approximate time spent coding",
+                        help="What algorithms should be used to approximate time spent coding. "
+                        + "Possible values: %(choices)s",
                         metavar="ALGO", dest='approx_algo')
 
     # add other options
     minutes = lambda m: timedelta(minutes=int(m))
-    parser.add_argument('--epsilon', '--eps', '-e', type=minutes, default=DEFAULT_EPSILON,
-                        help="Maximum time between commits which are still considered a single coding session",
+    parser.add_argument('--epsilon', '--eps', '-e', type=minutes, default=minutes(DEFAULT_EPSILON_MINUTES),
+                        help="Maximum time between commits which are still considered a single coding session "
+                        + "(default: %s)" % DEFAULT_EPSILON_MINUTES,
                         metavar="MINUTES", dest='epsilon')
     
     return parser
@@ -59,9 +62,13 @@ def create_argument_parser():
 
 OUTPUT_FORMATS = ['table', 'json']
 CLUSTERING_ALGORITHMS = ['simple']
-APPROXIMATION_ALGORITHMS = ['start10', 'ten2five', 'quarter_end']
+APPROXIMATION_ALGORITHMS = {
+    'start10': "Simple algorithm that adds 10 minutes before first commit",
+    'ten2five': "Simple algorithm that adds 10 minutes before first and 5 minutes after last commit",
+    'quarter_end': "Uses average time between commits in session, adding 1/4th of it after last commit",
+}
 
-DEFAULT_EPSILON = timedelta(minutes=30)
+DEFAULT_EPSILON_MINUTES = 30
 
 
 ### Logic
