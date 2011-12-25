@@ -36,6 +36,15 @@ def approximate_coding_sessions(clustered_commits, approx_algo):
 
 ## Algorithms
 
-def start5_approximation(commit_cluster):
-	''' A simple approximation that adds 5 minutes before the first commit in cluster. '''
-	return Session(commit_cluster, timedelta(minutes=5), timedelta())
+def start10_approximation(commit_cluster):
+	''' A simple approximation that adds 10 minutes before the first commit in cluster. '''
+	return Session(commit_cluster, timedelta(minutes=10), timedelta())
+
+def ten2five_approximation(commit_cluster):
+	''' A simple approximation that adds 10 minutes before the first commit and 5 after the last one,
+	except for sessions consisting of single commit.
+	'''
+	if len(commit_cluster) > 1:
+		return Session(commit_cluster, timedelta(minutes=10), timedelta(minutes=5))
+	else:
+		return Session(commit_cluster, timedelta(minutes=5), timedelta())

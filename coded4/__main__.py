@@ -44,7 +44,7 @@ def create_argument_parser():
     parser.add_argument('--cluster-algo', '-c', default='simple', choices=CLUSTERING_ALGORITHMS,
                         help="What algorithm should be used to cluster individual commits",
                         metavar="ALGO", dest='cluster_algo')
-    parser.add_argument('--approx-algo', '-a', default='start5', choices=APPROXIMATION_ALGORITHMS,
+    parser.add_argument('--approx-algo', '-a', default='start10', choices=APPROXIMATION_ALGORITHMS,
                         help="What algorithms should be used to approximate time spent coding",
                         metavar="ALGO", dest='approx_algo')
 
@@ -59,7 +59,7 @@ def create_argument_parser():
 
 
 CLUSTERING_ALGORITHMS = ['simple']
-APPROXIMATION_ALGORITHMS = ['start5']
+APPROXIMATION_ALGORITHMS = ['start10', 'ten2five']
 OUTPUT_FORMATS = ['table', 'json']
 
 DEFAULT_EPSILON = timedelta(minutes=30)
