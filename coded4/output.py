@@ -69,6 +69,14 @@ def output_table(repo_name, contribs, totals):
 
     return str.join('\n', lines)
 
+def output_json(repo_name, contribs, totals):
+    ''' Outputs the repository statistics in JSON format. '''
+    import json
+
+    totals = dict(item for item in totals.iteritems() if item[0] != 'name')
+    res = {'repo': repo_name, 'contributors': contribs, 'total': totals}
+    return json.dumps(res, default=timedelta_to_str)
+
 
 ### Utilities
 
