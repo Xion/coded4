@@ -10,7 +10,7 @@ import os
 SUPPORTED_VCS = ['git', 'hg']
 
 
-def retrieve_commit_history(directory, vcs_name=None):
+def retrieve_commit_history(directory, vcs_name=None, interval=None):
     ''' Retrieves history of commit for given repository.
     @return: List of Commit tuples
     '''
@@ -18,11 +18,13 @@ def retrieve_commit_history(directory, vcs_name=None):
     if not vcs_name:
         raise ValueError, "Could not find any known version control system in given directory"
 
+    interval = interval or (None, None)
+
     history_func = globals().get(vcs_name + '_history')
     if not history_func:
         raise ValueError, "Version control system '%s' is not supported" % vcs_name
 
-    history = history_func(directory)
+    history = history_func(directory, interval)
     return sorted(history, key=lambda c: c.time, reverse=True)
 
 def detect_vcs(directory):
@@ -40,11 +42,18 @@ Commit = namedtuple('Commit', ['hash', 'time', 'author', 'message'])
 
 ### Git support
 
-def git_history(path):
+GIT_TIME_FORMAT = '%Y-%m-%d %H:%i:%s'
+
+def git_history(path, interval):
     ''' Returns a list of Commit tuples with history for given Git repo. '''
     sep = '|'
     git_log_format = str.join(sep, ['%H', '%at', '%an', '%s'])
     git_log = 'git log --format=format:"%s"' % git_log_format
+
+    since, until = interval
+    if since:   git_log += ' --since="%s"' % since.strftime(GIT_TIME_FORMAT)
+    if until:   git_log += ' --until="%s"' % until.strftime(GIT_TIME_FORMAT)
+
     log = exec_command(git_log, path)
 
     history = []
@@ -58,7 +67,7 @@ def git_history(path):
 
 ### Hg support
 
-def hg_history(path):
+def hg_history(path, interval):
     ''' Returns a list of Commit tuples with history for given Mercurial repo. '''
     sep = '|'
     hg_log_template = str.join(sep, ['{node}', '{date|hgdate}', '{author|person}', '{desc|firstline}'])
