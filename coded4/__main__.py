@@ -10,7 +10,7 @@ import approx
 import stats
 from output import format_output
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 import argparse
 
 
@@ -39,6 +39,17 @@ def create_argument_parser():
                         help="Output format (formatted table by default)",
                         metavar="FORMAT", dest='output')
 
+    # add filtering arguments
+    timespec = lambda s: datetime.strptime(s, DATETIME_FORMAT)
+    parser.add_argument('--since', '--after', type=timespec, default=None,
+                        help="Include only commits after specified date (%s)"
+                             % DATETIME_FORMAT.replace('%', ''),
+                        metavar="DATE", dest='since')
+    parser.add_argument('--until', '--before', type=timespec, default=None,
+                        help="Include only commits before specified date (%s)"
+                              % DATETIME_FORMAT.replace('%', ''),
+                        metavar="DATE", dest='until')
+
     # add algorithms
     parser.add_argument('--cluster-algo', '-c', default='simple', choices=CLUSTERING_ALGORITHMS,
                         help="What algorithm should be used to cluster individual commits. "
@@ -59,6 +70,7 @@ def create_argument_parser():
     return parser
 
 
+DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 OUTPUT_FORMATS = ['table', 'json']
 CLUSTERING_ALGORITHMS = ['simple']
 APPROXIMATION_ALGORITHMS = {
@@ -78,7 +90,7 @@ def calculate_statistics(args):
     ''' Calculates statistics, as dictated by command line args.
     @return: List of Contributor tuples
     '''
-    commit_history = vcs.retrieve_commit_history(args.directory, args.vcs)
+    commit_history = vcs.retrieve_commit_history(args.directory, args.vcs, (args.since, args.until))
     grouped_commits = cluster.group_by_contributors(commit_history)
     clustered_commits = cluster.cluster_commits(grouped_commits, args.cluster_algo, args.epsilon)
     coding_sessions = approx.approximate_coding_sessions(clustered_commits, args.approx_algo)

@@ -42,7 +42,7 @@ Commit = namedtuple('Commit', ['hash', 'time', 'author', 'message'])
 
 ### Git support
 
-GIT_TIME_FORMAT = '%Y-%m-%d %H:%i:%s'
+GIT_TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 def git_history(path, interval):
     ''' Returns a list of Commit tuples with history for given Git repo. '''
