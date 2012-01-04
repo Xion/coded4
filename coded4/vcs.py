@@ -67,11 +67,24 @@ def git_history(path, interval):
 
 ### Hg support
 
+HG_TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
+
 def hg_history(path, interval):
     ''' Returns a list of Commit tuples with history for given Mercurial repo. '''
     sep = '|'
     hg_log_template = str.join(sep, ['{node}', '{date|hgdate}', '{author|person}', '{desc|firstline}'])
     hg_log = r'hg log --template "%s\n"' % hg_log_template
+
+    # add date filter if interval is specified
+    date_filter = None
+    since, until = interval
+    if since and until:
+        date_filter = since.strftime(HG_TIME_FORMAT) + ' to ' + until.strftime(HG_TIME_FORMAT)
+    elif since: date_filter = '>' + since.strftime(HG_TIME_FORMAT)
+    elif until: date_filter = '<' + until.strftime(HG_TIME_FORMAT)
+    if date_filter:
+        hg_log += ' --date "%s"' % date_filter
+
     log = exec_command(hg_log, path)
 
     history = []
