@@ -4,7 +4,6 @@ Code for calculating statistics based on commit history.
 from collections import namedtuple
 from itertools import chain
 from datetime import timedelta
-import vcs
 
 
 Contributor = namedtuple('Contributor', ['name', 'sessions', 'total_time'])
@@ -19,7 +18,7 @@ def compute_time_stats(coding_sessions):
     contributors = []
     for author, sessions in coding_sessions.iteritems():
         total_time = sum((s.total_time for s in sessions), timedelta())
-        contributors.append(Contributor(author, sessions, total_time))        
+        contributors.append(Contributor(author, sessions, total_time))
 
     return contributors
 
