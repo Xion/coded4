@@ -10,18 +10,21 @@ from coded4.stats import calculate_totals
 
 def format_output(repo_dir, contributors, output_format):
     """Formats the output in specified format.
+
     :param repo_dir: Path to directory with repo that had its statistics generated
     :param contributors: List of Contributor tuples
     :param output_format: Name of output format
     """
     output_func = globals().get('output_' + output_format)
     if not output_func:
-        raise ValueError, "Unknown or unsupported output format '%s'" % output_format
+        raise ValueError(
+            "Unknown or unsupported output format '%s'" % output_format)
 
     repo_name = os.path.basename(repo_dir)
     contribs = map(to_output_dict, contributors)
     totals = to_output_dict(calculate_totals(contributors))
     return output_func(repo_name, contribs, totals)
+
 
 def to_output_dict(contributor):
     """Converts Contributor tuple into output dictionary. """
@@ -38,7 +41,8 @@ def to_output_dict(contributor):
 def output_table(repo_name, contribs, totals):
     """Outputs the repository statistics as table. """
     items = contribs + [totals]
-    if not items:   return ''
+    if not items:
+        return ""
 
     to_str = (lambda obj: timedelta_to_str(obj)
                           if isinstance(obj, timedelta) else str(obj))
@@ -68,14 +72,19 @@ def output_table(repo_name, contribs, totals):
     lines.append('-' * max_row_len)
     lines.append(make_row(lambda key: to_str(totals[key])))
 
-    return str.join('\n', lines)
+    return os.linesep.join(lines)
+
 
 def output_json(repo_name, contribs, totals):
     """Outputs the repository statistics in JSON format. """
     import json
 
     totals = dict(item for item in totals.iteritems() if item[0] != 'name')
-    res = {'repo': repo_name, 'contributors': contribs, 'total': totals}
+    res = {
+        'repo': repo_name,
+        'contributors': contribs,
+        'total': totals,
+    }
     return json.dumps(res, default=timedelta_to_str)
 
 
@@ -84,7 +93,8 @@ def output_json(repo_name, contribs, totals):
 def timedelta_to_str(td):
     """Converts timedelta into nice, user-readable string. """
     res = ''
-    if td.days != 0: res += str(td.days) + "d "
+    if td.days != 0:
+        res += str(td.days) + "d "
 
     seconds = td.seconds
     hours = seconds / 3600  ; seconds -= hours * 3600
