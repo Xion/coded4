@@ -5,15 +5,19 @@ from collections import namedtuple
 from datetime import timedelta
 
 
-Session = namedtuple('Session', ['commits', 'time_before_first', 'time_after_last'])
+class Session(namedtuple('Session',
+                         ['commits', 'time_before_first', 'time_after_last'])):
+    """Represents a single coding session.
 
-def __session_total_time(session):
-    total = session.time_before_first + session.time_after_last
-    if session.commits:
-        total += session.commits[0].time - session.commits[-1].time
-    return total
-
-Session.total_time = property(__session_total_time)
+    Session consists of commits, plus some approximated time before the first
+    and after last commit.
+    """
+    @property
+    def total_time(self):
+        total = self.time_before_first + self.time_after_last
+        if self.commits:
+            total += self.commits[0].time - self.commits[-1].time
+        return total
 
 
 def approximate_coding_sessions(clustered_commits, approx_algo):

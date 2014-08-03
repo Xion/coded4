@@ -28,6 +28,7 @@ def retrieve_commit_history(directory, vcs_name=None, interval=None):
     history = history_func(directory, interval)
     return sorted(history, key=lambda c: c.time, reverse=True)
 
+
 def detect_vcs(directory):
     """Checks which of the supported VCS has repo in given directory.
     :return: Name of version control system found in given directory

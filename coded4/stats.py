@@ -6,8 +6,13 @@ from datetime import timedelta
 from itertools import chain
 
 
-Contributor = namedtuple('Contributor', ['name', 'sessions', 'total_time'])
-Contributor.commits = property(lambda c: list(chain(*c.sessions)))
+class Contributor(namedtuple('Contributor',
+                             ['name', 'sessions', 'total_time'])):
+    """Represents a single contributor to the repository."""
+
+    @property
+    def commits(self):
+        return list(chain(self.sessions))
 
 
 def compute_time_stats(coding_sessions):
