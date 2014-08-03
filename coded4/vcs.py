@@ -28,7 +28,7 @@ def retrieve_commit_history(directory, vcs_name=None, interval=None):
             "Version control system '%s' is not supported" % vcs_name)
 
     history = history_func(directory, interval)
-    return sorted(history, lambda c: c.time, reverse=True)
+    return sorted(history, key=lambda c: c.time, reverse=True)
 
 
 def detect_vcs(directory):
