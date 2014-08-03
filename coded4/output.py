@@ -1,6 +1,6 @@
-'''
+"""
 Generating output in various formats.
-'''
+"""
 from collections import OrderedDict
 from datetime import timedelta
 import os
@@ -9,11 +9,11 @@ from coded4.stats import calculate_totals
 
 
 def format_output(repo_dir, contributors, output_format):
-    ''' Formats the output in specified format.
+    """Formats the output in specified format.
     @param repo_dir: Path to directory with repo that had its statistics generated
     @param contributors: List of Contributor tuples
     @param output_format: Name of output format
-    '''
+    """
     output_func = globals().get('output_' + output_format)
     if not output_func:
         raise ValueError, "Unknown or unsupported output format '%s'" % output_format
@@ -24,7 +24,7 @@ def format_output(repo_dir, contributors, output_format):
     return output_func(repo_name, contribs, totals)
 
 def to_output_dict(contributor):
-    ''' Converts Contributor tuple into output dictionary. '''
+    """Converts Contributor tuple into output dictionary. """
     res = OrderedDict()
     res['name'] = contributor.name
     res['sessions'] = len(contributor.sessions)
@@ -36,7 +36,7 @@ def to_output_dict(contributor):
 ## Formatting functions
 
 def output_table(repo_name, contribs, totals):
-    ''' Outputs the repository statistics as table. '''
+    """Outputs the repository statistics as table. """
     items = contribs + [totals]
     if not items:   return ''
 
@@ -71,7 +71,7 @@ def output_table(repo_name, contribs, totals):
     return str.join('\n', lines)
 
 def output_json(repo_name, contribs, totals):
-    ''' Outputs the repository statistics in JSON format. '''
+    """Outputs the repository statistics in JSON format. """
     import json
 
     totals = dict(item for item in totals.iteritems() if item[0] != 'name')
@@ -82,7 +82,7 @@ def output_json(repo_name, contribs, totals):
 ### Utilities
 
 def timedelta_to_str(td):
-    ''' Converts timedelta into nice, user-readable string. '''
+    """Converts timedelta into nice, user-readable string. """
     res = ''
     if td.days != 0: res += str(td.days) + "d "
 

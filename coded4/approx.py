@@ -1,6 +1,6 @@
-'''
+"""
 Algorithms for approximating coding sessions
-'''
+"""
 from collections import namedtuple
 from datetime import timedelta
 
@@ -17,11 +17,11 @@ Session.total_time = property(__session_total_time)
 
 
 def approximate_coding_sessions(clustered_commits, approx_algo):
-    ''' Approximates the coding sessions that resulted in given clustered commits.
+    """Approximates the coding sessions that resulted in given clustered commits.
     @param clustered_commits: Dictionary mapping contributor names to lists of commit clusters
     @param approx_algo: Name of approximation algorithm
     @return: Dictionary mapping contributor names to lists of Session tuples
-    '''
+    """
     approx_func = globals().get(approx_algo + '_approximation')
     if not approx_func:
         raise ValueError, "Unknown approximation '%s'" % approx_algo
@@ -39,26 +39,26 @@ def approximate_coding_sessions(clustered_commits, approx_algo):
 SINGLE_COMMIT_TIMES = timedelta(minutes=5), timedelta()
 
 def null_approximation(commit_cluster):
-    ''' A "null" approximation that doesn't add any additional time.
-    Useful for testing but not for much else. '''
+    """A "null" approximation that doesn't add any additional time.
+    Useful for testing but not for much else. """
     return Session(commit_cluster, timedelta(), timedelta())
 
 def start10_approximation(commit_cluster):
-    ''' A simple approximation that adds 10 minutes before the first commit in cluster. '''
+    """A simple approximation that adds 10 minutes before the first commit in cluster. """
     return Session(commit_cluster, timedelta(minutes=10), timedelta())
 
 def ten2five_approximation(commit_cluster):
-    ''' A simple approximation that adds 10 minutes before the first commit and 5 after the last one,
+    """A simple approximation that adds 10 minutes before the first commit and 5 after the last one,
     except for sessions consisting of single commit.
-    '''
+    """
     if len(commit_cluster) > 1:
         return Session(commit_cluster, timedelta(minutes=10), timedelta(minutes=5))
     return Session(commit_cluster, *SINGLE_COMMIT_TIMES)
 
 def quarter_end_approximation(commit_cluster):
-    ''' A slightly more sophisticated approximation that uses
+    """A slightly more sophisticated approximation that uses
     the average time between commits in a session.
-    '''
+    """
     diffs = commit_time_diff(commit_cluster)
     if diffs:
         average_diff = sum(diffs, timedelta()) / len(diffs)
@@ -69,9 +69,9 @@ def quarter_end_approximation(commit_cluster):
     return Session(commit_cluster, *SINGLE_COMMIT_TIMES)
 
 def polynomial_approximation(commit_cluster):
-    ''' Approximation that fits a polynomial into differences between commit times,
+    """Approximation that fits a polynomial into differences between commit times,
     and uses it to extrapolate into the time before first and after last commit.
-    '''
+    """
     diffs = commit_time_diff(commit_cluster)
     if diffs:
         # Lagrange interpolation
@@ -94,7 +94,7 @@ def polynomial_approximation(commit_cluster):
 ## Utilities
 
 def commit_time_diff(commits):
-    ''' Returns time differences between commits. '''
+    """Returns time differences between commits. """
     if not commits or len(commits) == 1:
         return []
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-'''
+"""
 Executable script.
-'''
+"""
 from __future__ import unicode_literals
 
 import vcs
@@ -27,7 +27,7 @@ def main():
 def create_argument_parser():
     parser = argparse.ArgumentParser(description="Calculate time spent coding by using commit timestamps",
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
-    
+
     # add general arguments
     parser.add_argument('directory', type=str, default='.',
                         help="Directory where the repository is contained (. by default)",
@@ -66,7 +66,7 @@ def create_argument_parser():
                         help="Maximum time between commits which are still considered a single coding session "
                         + "(default: %s)" % DEFAULT_EPSILON_MINUTES,
                         metavar="MINUTES", dest='epsilon')
-    
+
     return parser
 
 
@@ -87,9 +87,9 @@ DEFAULT_EPSILON_MINUTES = 30
 ### Logic
 
 def calculate_statistics(args):
-    ''' Calculates statistics, as dictated by command line args.
+    """Calculates statistics, as dictated by command line args.
     @return: List of Contributor tuples
-    '''
+    """
     commit_history = vcs.retrieve_commit_history(args.directory, args.vcs, (args.since, args.until))
     grouped_commits = cluster.group_by_contributors(commit_history)
     clustered_commits = cluster.cluster_commits(grouped_commits, args.cluster_algo, args.epsilon)

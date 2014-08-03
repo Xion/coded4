@@ -1,6 +1,6 @@
-'''
+"""
 Code for supporting specific VCS (version control systems).
-'''
+"""
 from collections import namedtuple
 from datetime import  datetime
 import os
@@ -12,9 +12,9 @@ SUPPORTED_VCS = ['git', 'hg']
 
 
 def retrieve_commit_history(directory, vcs_name=None, interval=None):
-    ''' Retrieves history of commit for given repository.
+    """Retrieves history of commit for given repository.
     @return: List of Commit tuples
-    '''
+    """
     vcs_name = vcs_name or detect_vcs(directory)
     if not vcs_name:
         raise ValueError, "Could not find any known version control system in given directory"
@@ -29,9 +29,9 @@ def retrieve_commit_history(directory, vcs_name=None, interval=None):
     return sorted(history, key=lambda c: c.time, reverse=True)
 
 def detect_vcs(directory):
-    ''' Checks which of the supported VCS has repo in given directory.
+    """Checks which of the supported VCS has repo in given directory.
     @return: Name of version control system found in given directory
-    '''
+    """
     for vcs in SUPPORTED_VCS:
         vcs_dir = os.path.join(directory, '.' + vcs)
         if os.path.isdir(vcs_dir):
@@ -46,7 +46,7 @@ Commit = namedtuple('Commit', ['hash', 'time', 'author', 'message'])
 GIT_TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 def git_history(path, interval):
-    ''' Returns a list of Commit tuples with history for given Git repo. '''
+    """Returns a list of Commit tuples with history for given Git repo. """
     sep = '|'
     git_log_format = str.join(sep, ['%H', '%at', '%an', '%s'])
     git_log = 'git log --format=format:"%s"' % git_log_format
@@ -71,7 +71,7 @@ def git_history(path, interval):
 HG_TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 def hg_history(path, interval):
-    ''' Returns a list of Commit tuples with history for given Mercurial repo. '''
+    """Returns a list of Commit tuples with history for given Mercurial repo. """
     sep = '|'
     hg_log_template = str.join(sep, ['{node}', '{date|hgdate}', '{author|person}', '{desc|firstline}'])
     hg_log = r'hg log --template "%s\n"' % hg_log_template

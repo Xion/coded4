@@ -1,6 +1,6 @@
-'''
+"""
 Code for calculating statistics based on commit history.
-'''
+"""
 from collections import namedtuple
 from datetime import timedelta
 from itertools import chain
@@ -11,10 +11,10 @@ Contributor.commits = property(lambda c: list(chain(*c.sessions)))
 
 
 def compute_time_stats(coding_sessions):
-    ''' Calculates time statistics, given list of coding sessions for every contributor.
+    """Calculates time statistics, given list of coding sessions for every contributor.
     @param coding_sessions: Dictionary mapping contributor names to lists of coding sessions
     @return: List of Contributor tuples
-    '''
+    """
     contributors = []
     for author, sessions in coding_sessions.iteritems():
         total_time = sum((s.total_time for s in sessions), timedelta())
@@ -24,9 +24,9 @@ def compute_time_stats(coding_sessions):
 
 
 def calculate_totals(contributors):
-    ''' Given list of contributors, calculates aggregate statistics.
+    """Given list of contributors, calculates aggregate statistics.
     @return: Fake Contributor tuple which contains the aggregated stats
-    '''
+    """
     if not contributors:    return
     measures = [('sessions', []), ('total_time', timedelta())]
 
