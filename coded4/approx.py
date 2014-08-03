@@ -18,9 +18,9 @@ Session.total_time = property(__session_total_time)
 
 def approximate_coding_sessions(clustered_commits, approx_algo):
     """Approximates the coding sessions that resulted in given clustered commits.
-    @param clustered_commits: Dictionary mapping contributor names to lists of commit clusters
-    @param approx_algo: Name of approximation algorithm
-    @return: Dictionary mapping contributor names to lists of Session tuples
+    :param clustered_commits: Dictionary mapping contributor names to lists of commit clusters
+    :param approx_algo: Name of approximation algorithm
+    :return: Dictionary mapping contributor names to lists of Session tuples
     """
     approx_func = globals().get(approx_algo + '_approximation')
     if not approx_func:

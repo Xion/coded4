@@ -13,7 +13,7 @@ SUPPORTED_VCS = ['git', 'hg']
 
 def retrieve_commit_history(directory, vcs_name=None, interval=None):
     """Retrieves history of commit for given repository.
-    @return: List of Commit tuples
+    :return: List of Commit tuples
     """
     vcs_name = vcs_name or detect_vcs(directory)
     if not vcs_name:
@@ -30,7 +30,7 @@ def retrieve_commit_history(directory, vcs_name=None, interval=None):
 
 def detect_vcs(directory):
     """Checks which of the supported VCS has repo in given directory.
-    @return: Name of version control system found in given directory
+    :return: Name of version control system found in given directory
     """
     for vcs in SUPPORTED_VCS:
         vcs_dir = os.path.join(directory, '.' + vcs)

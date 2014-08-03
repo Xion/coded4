@@ -10,9 +10,9 @@ from coded4.stats import calculate_totals
 
 def format_output(repo_dir, contributors, output_format):
     """Formats the output in specified format.
-    @param repo_dir: Path to directory with repo that had its statistics generated
-    @param contributors: List of Contributor tuples
-    @param output_format: Name of output format
+    :param repo_dir: Path to directory with repo that had its statistics generated
+    :param contributors: List of Contributor tuples
+    :param output_format: Name of output format
     """
     output_func = globals().get('output_' + output_format)
     if not output_func:

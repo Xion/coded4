@@ -88,7 +88,7 @@ DEFAULT_EPSILON_MINUTES = 30
 
 def calculate_statistics(args):
     """Calculates statistics, as dictated by command line args.
-    @return: List of Contributor tuples
+    :return: List of Contributor tuples
     """
     commit_history = vcs.retrieve_commit_history(args.directory, args.vcs, (args.since, args.until))
     grouped_commits = cluster.group_by_contributors(commit_history)
