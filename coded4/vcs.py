@@ -3,8 +3,9 @@ Code for supporting specific VCS (version control systems).
 '''
 from collections import namedtuple
 from datetime import  datetime
-from utils import exec_command
 import os
+
+from coded4.utils import exec_command
 
 
 SUPPORTED_VCS = ['git', 'hg']

@@ -2,8 +2,8 @@
 Code for calculating statistics based on commit history.
 '''
 from collections import namedtuple
-from itertools import chain
 from datetime import timedelta
+from itertools import chain
 
 
 Contributor = namedtuple('Contributor', ['name', 'sessions', 'total_time'])

@@ -3,8 +3,9 @@ Generating output in various formats.
 '''
 from collections import OrderedDict
 from datetime import timedelta
-from stats import calculate_totals
 import os
+
+from coded4.stats import calculate_totals
 
 
 def format_output(repo_dir, contributors, output_format):
