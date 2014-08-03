@@ -16,8 +16,12 @@ class Contributor(namedtuple('Contributor',
 
 
 def compute_time_stats(coding_sessions):
-    """Calculates time statistics, given list of coding sessions for every contributor.
-    :param coding_sessions: Dictionary mapping contributor names to lists of coding sessions
+    """Calculates time statistics,
+    given list of coding sessions for every contributor.
+
+    :param coding_sessions: Dictionary mapping contributor names
+                            to lists of coding Sessions
+
     :return: List of Contributor tuples
     """
     contributors = []
@@ -30,9 +34,13 @@ def compute_time_stats(coding_sessions):
 
 def calculate_totals(contributors):
     """Given list of contributors, calculates aggregate statistics.
-    :return: Fake Contributor tuple which contains the aggregated stats
+
+    :return: Fake Contributor tuple which contains the aggregated stats,
+             or None
     """
-    if not contributors:    return
+    if not contributors:
+        return
+
     measures = [('sessions', []), ('total_time', timedelta())]
 
     sums = [initial for _, initial in measures]
