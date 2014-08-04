@@ -58,7 +58,7 @@ def create_argument_parser():
         metavar="ALGO", dest='cluster_algo')
     parser.add_argument(
         '--approx-algo', '-a',
-        default='polynomial', choices=APPROXIMATION_ALGORITHMS,
+        default='ten2five', choices=APPROXIMATION_ALGORITHMS,
         help="What algorithms should be used to approximate time spent coding. "
              "Possible values: %(choices)s",
         metavar="ALGO", dest='approx_algo')
@@ -86,8 +86,6 @@ APPROXIMATION_ALGORITHMS = {
                 "and 5 minutes after last commit",
     'quarter_end': "Uses average time between commits in session, "
                    "adding 1/4th of it after last commit",
-    'polynomial': "Fits a polynomial into intervals between commits "
-                  "and extrapolates it for time before first and after last",
 }
 
 DEFAULT_EPSILON_MINUTES = 30

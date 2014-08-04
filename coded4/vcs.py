@@ -48,6 +48,7 @@ Commit = namedtuple('Commit', ['hash', 'time', 'author', 'message'])
 
 GIT_TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 
+
 def git_history(path, interval):
     """Returns a list of Commit tuples with history for given Git repo. """
     sep = '|'
@@ -74,6 +75,7 @@ def git_history(path, interval):
 ### Hg support
 
 HG_TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
+
 
 def hg_history(path, interval):
     """Returns a list of Commit tuples with history

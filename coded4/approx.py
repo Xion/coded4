@@ -84,33 +84,6 @@ def quarter_end_approximation(commit_cluster):
     return Session(commit_cluster, *SINGLE_COMMIT_TIMES)
 
 
-def polynomial_approximation(commit_cluster):
-    """Approximation that fits a polynomial into differences between
-    commit times, and uses it to extrapolate into the time
-    before first and after last commit.
-    """
-    diffs = commit_time_diff(commit_cluster)
-    if diffs:
-        # Lagrange interpolation
-        k = len(diffs) - 1
-        xs, ys = range(k+1), diffs
-        l = lambda j, x: reduce(float.__mul__, (
-            ((x - xs[m]) / (xs[j] - xs[m])) for m in xrange(k + 1) if m != j),
-            1.0)
-
-        # interpolated polynomial
-        mul = lambda td, f: timedelta(seconds=td.total_seconds() * f)    # multiply timedelta and float
-        L = lambda x: sum(
-            (mul(ys[j], l(j, x)) for j in xrange(k + 1)),
-            timedelta())
-
-        before_first = L(k + 1)
-        after_last = L(-0.25)
-        return Session(commit_cluster, before_first, after_last)
-
-    return Session(commit_cluster, *SINGLE_COMMIT_TIMES)
-
-
 ## Utilities
 
 def commit_time_diff(commits):

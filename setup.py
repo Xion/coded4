@@ -46,7 +46,7 @@ setup(name="coded4",
       url="http://github.com/Xion/coded4",
       license=tags['__license__'],
 
-      classifiers = [
+      classifiers=[
          'Development Status :: 4 - Beta',
          'Intended Audience :: Developers',
          'Intended Audience :: Information Technology',
@@ -57,8 +57,8 @@ setup(name="coded4",
          'Topic :: Software Development',
       ],
 
-      packages = find_packages(),
-      entry_points = {
+      packages=find_packages(),
+      entry_points={
           'console_scripts': [
               'coded4 = coded4.__main__:main',
           ],
