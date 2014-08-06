@@ -75,6 +75,22 @@ def output_table(repo_name, contribs, totals):
     return os.linesep.join(lines)
 
 
+def output_csv(repo_name, contribs, totals):
+    """Outputs the repository statistics in CSV format."""
+    import csv
+    from StringIO import StringIO
+
+    result = StringIO()
+
+    writer = csv.DictWriter(result, totals.keys(), delimiter=',',
+                            quotechar='"', quoting=csv.QUOTE_MINIMAL)
+    writer.writerows(contribs)
+    writer.writerow(totals)
+
+    result.seek(0)
+    return result.read()
+
+
 def output_json(repo_name, contribs, totals):
     """Outputs the repository statistics in JSON format. """
     import json

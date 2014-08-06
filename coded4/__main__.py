@@ -36,7 +36,8 @@ def create_argument_parser():
         metavar="TYPE", dest='vcs')
     parser.add_argument(
         '--format', '-f', type=str, default='table', choices=OUTPUT_FORMATS,
-        help="Output format (formatted table by default)",
+        help="Output format (formatted table by default). "
+             "Possible choices: %(choices)s",
         metavar="FORMAT", dest='output')
 
     # add filtering arguments
@@ -76,7 +77,7 @@ def create_argument_parser():
 
 
 DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
-OUTPUT_FORMATS = ['table', 'json']
+OUTPUT_FORMATS = ['table', 'csv', 'json']
 CLUSTERING_ALGORITHMS = ['simple']
 APPROXIMATION_ALGORITHMS = {
     'null': "Null approximation (i.e. uses only time between commits), "
@@ -108,7 +109,7 @@ def calculate_statistics(args):
         clustered_commits, args.approx_algo)
     contributors = stats.compute_time_stats(coding_sessions)
 
-    return sorted(contributors, key = lambda c: len(c.commits), reverse=True)
+    return sorted(contributors, key=lambda c: len(c.commits), reverse=True)
 
 
 if __name__ == '__main__':
