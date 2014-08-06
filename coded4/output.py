@@ -40,6 +40,9 @@ def to_output_dict(contributor):
 
 ## Formatting functions
 
+str_ = ''.__class__
+
+
 def output_table(repo_name, contribs, totals):
     """Outputs the repository statistics as table. """
     items = contribs + [totals]
@@ -82,7 +85,7 @@ def output_csv(repo_name, contribs, totals):
     import csv
     from StringIO import StringIO
 
-    utf8 = lambda x: ''.__class__(x).encode('utf-8')
+    utf8 = lambda x: str_(x).encode('utf-8')
 
     result = StringIO()
     writer = csv.writer(result, delimiter=utf8(','),
@@ -122,13 +125,13 @@ def timedelta_to_str(td):
     """Converts timedelta into nice, user-readable string. """
     res = ''
     if td.days != 0:
-        res += str(td.days) + "d "
+        res += str_(td.days) + "d "
 
     seconds = td.seconds
     hours = seconds / 3600  ; seconds -= hours * 3600
     minutes = seconds / 60  ; seconds -= minutes * 60
 
-    parts = (str(x).rjust(2, '0') for x in (hours, minutes, seconds))
-    res += str.join(":", parts)
+    parts = (str_(x).rjust(2, '0') for x in (hours, minutes, seconds))
+    res += ":".join(parts)
 
     return res
