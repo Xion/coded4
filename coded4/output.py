@@ -1,6 +1,8 @@
 """
 Generating output in various formats.
 """
+from __future__ import unicode_literals
+
 from collections import OrderedDict
 from datetime import timedelta
 import os
@@ -80,12 +82,22 @@ def output_csv(repo_name, contribs, totals):
     import csv
     from StringIO import StringIO
 
-    result = StringIO()
+    utf8 = lambda x: ''.__class__(x).encode('utf-8')
 
-    writer = csv.DictWriter(result, totals.keys(), delimiter=',',
-                            quotechar='"', quoting=csv.QUOTE_MINIMAL)
-    writer.writerows(contribs)
-    writer.writerow(totals)
+    result = StringIO()
+    writer = csv.writer(result, delimiter=utf8(','),
+                        quotechar=utf8('"'), quoting=csv.QUOTE_MINIMAL)
+
+    def write_contrib(contrib):
+        """Write a single contributor as CSV, handling Unicode encoding."""
+        contrib = contrib.copy()
+        for key in ('name', 'time'):
+            contrib[key] = utf8(contrib[key])
+        writer.writerow(contrib.values())
+
+    for contrib in contribs:
+        write_contrib(contrib)
+    write_contrib(totals)
 
     result.seek(0)
     return result.read()
