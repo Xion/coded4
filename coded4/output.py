@@ -4,6 +4,7 @@ Generating output in various formats.
 from __future__ import unicode_literals
 
 from collections import OrderedDict
+from copy import deepcopy
 from datetime import timedelta
 import os
 
@@ -38,7 +39,7 @@ def to_output_dict(contributor):
     return res
 
 
-## Formatting functions
+# Formatting functions
 
 str_ = ''.__class__
 
@@ -109,17 +110,34 @@ def output_csv(repo_name, contribs, totals):
 def output_json(repo_name, contribs, totals):
     """Outputs the repository statistics in JSON format. """
     import json
+    return json.dumps(repo_dict(repo_name, contribs, totals),
+                      default=timedelta_to_str)
 
-    totals = dict(item for item in totals.iteritems() if item[0] != 'name')
-    res = {
+
+def output_plist(repo_name, contribs, totals):
+    """Outputs the repository statistics in .plist format."""
+    import plistlib
+
+    res = repo_dict(repo_name, contribs, totals)
+    for c in res['contributors'] + [res['total']]:
+        c['time'] = timedelta_to_str(c['time'])
+
+    return plistlib.writePlistToString(res)
+
+
+# Utilities
+
+def repo_dict(repo_name, contribs, totals):
+    """Return a dictionary of repo statistics,
+    suitable for certain formats such as JSON.
+    """
+    totals = dict(item for item in totals.items() if item[0] != 'name')
+    return {
         'repo': repo_name,
-        'contributors': contribs,
+        'contributors': deepcopy(contribs),
         'total': totals,
     }
-    return json.dumps(res, default=timedelta_to_str)
 
-
-### Utilities
 
 def timedelta_to_str(td):
     """Converts timedelta into nice, user-readable string. """
