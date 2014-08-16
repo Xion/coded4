@@ -114,6 +114,33 @@ def output_json(repo_name, contribs, totals):
                       default=timedelta_to_str)
 
 
+def output_yaml(repo_name, contribs, totals):
+    """Output the repository statistics in YAML format."""
+    from StringIO import StringIO
+
+    result = StringIO()
+    print >>result, "repo:", repo_name
+
+    def write_contrib(contrib, indent=0):
+        prefix = "- "
+        indent = " " * indent
+        for key, value in contrib.items():
+            print >>result, indent + "%s%s: %s" % (prefix, key, value)
+            prefix = "  "
+
+    print >>result, "contributors:"
+    for contrib in contribs:
+        write_contrib(contrib)
+
+    print >>result, "totals:"
+    totals = totals.copy()
+    totals.pop('name')
+    write_contrib(totals)
+
+    result.seek(0)
+    return result.read()
+
+
 def output_plist(repo_name, contribs, totals):
     """Outputs the repository statistics in .plist format."""
     import plistlib
