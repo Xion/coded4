@@ -60,8 +60,8 @@ def output_table(repo_name, contribs, totals):
     max_row_len = sum(max_col_lens) + (len(labels) - 1)
 
     def make_row(cell_func):
-        return str.join(' ', (cell_func(label).ljust(col_len)
-                              for label, col_len in zip(labels, max_col_lens)))
+        return ' '.join(cell_func(label).ljust(col_len)
+                        for label, col_len in zip(labels, max_col_lens))
 
     lines = ["Statistics for '%s'" % repo_name, '']
 
