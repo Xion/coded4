@@ -4,6 +4,9 @@ Algorithms for approximating coding sessions
 from collections import namedtuple
 from datetime import timedelta
 
+from taipan.collections import dicts
+from taipan.functional.combinators import curry
+
 
 class Session(namedtuple('Session',
                          ['commits', 'time_before_first', 'time_after_last'])):
@@ -33,12 +36,7 @@ def approximate_coding_sessions(clustered_commits, approx_algo):
     if not approx_func:
         raise ValueError("Unknown approximation '%s'" % approx_algo)
 
-    sessions_dict = {}
-    for author, commit_clusters in clustered_commits.iteritems():
-        sessions = map(approx_func, commit_clusters)
-        sessions_dict[author] = sessions
-
-    return sessions_dict
+    return dicts.mapvalues(curry(map, approx_func), clustered_commits)
 
 
 ## Algorithms

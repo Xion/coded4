@@ -8,6 +8,8 @@ from copy import deepcopy
 from datetime import timedelta
 import os
 
+from taipan.collections import dicts
+
 from coded4.stats import calculate_totals
 
 
@@ -133,7 +135,7 @@ def output_yaml(repo_name, contribs, totals):
         write_contrib(contrib)
 
     print >>result, "totals:"
-    write_contrib(dict_without(totals, ['name']))
+    write_contrib(dicts.omit(['name'], from_=totals))
 
     result.seek(0)
     return result.read()
@@ -158,13 +160,13 @@ def output_xml(repo_name, contribs, totals):
     stats = ET.Element('statistics', attrib={'repo': repo_name})
 
     def write_contrib(contrib, parent, tag):
-        attrs = dict((key, str_(value)) for key, value in contrib.items())
-        ET.SubElement(parent, tag, attrs)
+        ET.SubElement(parent, tag, attrib=dicts.mapvalues(str_, contrib))
 
     contributors = ET.SubElement(stats, 'contributors')
     for contrib in contribs:
         write_contrib(contrib, parent=contributors, tag='contributor')
-    write_contrib(dict_without(totals, ['name']), parent=stats, tag='totals')
+    write_contrib(dicts.omit(['name'], from_=totals),
+                  parent=stats, tag='totals')
 
     result = StringIO()
     ET.ElementTree(stats).write(result, encoding='utf-8', xml_declaration=True)
@@ -187,7 +189,7 @@ def output_sexp(repo_name, contribs, totals):
 
     for contrib in contribs:
         write_contrib(contrib, tag='contributor', indent=1)
-    write_contrib(dict_without(totals, ['name']), tag='totals', indent=1)
+    write_contrib(dicts.omit(['name'], from_=totals), tag='totals', indent=1)
 
     # insert final closing parenthesis before the last newline
     result.seek(-len(os.linesep), 1)
@@ -225,13 +227,3 @@ def timedelta_to_str(td):
     res += ":".join(parts)
 
     return res
-
-
-def dict_without(dict_, keys):
-    """Returns a dictionary without specified keys.
-    :raise KeyError: If any of the keys do not exist in the dictionary
-    """
-    dict_ = dict_.copy()
-    for key in keys:
-        dict_.pop(key)
-    return dict_

@@ -3,7 +3,9 @@ Code for calculating statistics based on commit history.
 """
 from collections import namedtuple
 from datetime import timedelta
-from itertools import chain
+from itertools import chain, starmap
+
+from taipan.collections import dicts
 
 
 class Contributor(namedtuple('Contributor',
@@ -13,6 +15,14 @@ class Contributor(namedtuple('Contributor',
     @property
     def commits(self):
         return list(chain(self.sessions))
+
+    @classmethod
+    def from_coding_sessions(cls, author, sessions):
+        """Create the Contributor structure from author name
+        and list of coding Sessions.
+        """
+        total_time = sum((s.total_time for s in sessions), timedelta())
+        return cls(author, sessions, total_time)
 
 
 def compute_time_stats(coding_sessions):
@@ -24,12 +34,8 @@ def compute_time_stats(coding_sessions):
 
     :return: List of Contributor tuples
     """
-    contributors = []
-    for author, sessions in coding_sessions.iteritems():
-        total_time = sum((s.total_time for s in sessions), timedelta())
-        contributors.append(Contributor(author, sessions, total_time))
-
-    return contributors
+    return starmap(Contributor.from_coding_sessions,
+                   dicts.iteritems(coding_sessions))
 
 
 def calculate_totals(contributors):

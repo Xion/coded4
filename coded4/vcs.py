@@ -5,6 +5,8 @@ from collections import namedtuple
 from datetime import  datetime
 import os
 
+from taipan.functional.functions import attr_func
+
 from coded4.utils import exec_command
 
 
@@ -28,7 +30,7 @@ def retrieve_commit_history(directory, vcs_name=None, interval=None):
             "Version control system '%s' is not supported" % vcs_name)
 
     history = history_func(directory, interval)
-    return sorted(history, key=lambda c: c.time, reverse=True)
+    return sorted(history, key=attr_func('time'), reverse=True)
 
 
 def detect_vcs(directory):

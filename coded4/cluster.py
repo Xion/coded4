@@ -1,6 +1,9 @@
 """
 Algorithms for clustering commits
 """
+from taipan.collections import dicts
+from taipan.functional.combinators import curry
+
 
 def group_by_contributors(commit_history):
     """Goes through commit history and groups commits by their authors.
@@ -29,12 +32,8 @@ def cluster_commits(grouped_commits, cluster_algo, epsilon):
     if not cluster_func:
         raise ValueError("Unknown clustering algorithm '%s'" % cluster_algo)
 
-    clustered = {}
-    for author, commits in grouped_commits.iteritems():
-        sessions = cluster_func(commits, epsilon)
-        clustered[author] = sessions
-
-    return clustered
+    return dicts.mapvalues(curry(cluster_func, epsilon=epsilon),
+                           grouped_commits)
 
 
 ## Algorithms
