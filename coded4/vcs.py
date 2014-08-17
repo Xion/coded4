@@ -52,7 +52,7 @@ GIT_TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 def git_history(path, interval):
     """Returns a list of Commit tuples with history for given Git repo. """
     sep = '|'
-    git_log_format = str.join(sep, ['%H', '%at', '%an', '%s'])
+    git_log_format = sep.join(['%H', '%at', '%an', '%s'])
     git_log = 'git log --format=format:"%s"' % git_log_format
 
     since, until = interval
@@ -82,8 +82,8 @@ def hg_history(path, interval):
     for given Mercurial repo.
     """
     sep = '|'
-    hg_log_template = str.join(sep, [
-        '{node}', '{date|hgdate}', '{author|person}', '{desc|firstline}'])
+    hg_log_template = sep.join(['{node}', '{date|hgdate}',
+                                '{author|person}', '{desc|firstline}'])
     hg_log = r'hg log --template "%s\n"' % hg_log_template
 
     # add date filter if interval is specified
