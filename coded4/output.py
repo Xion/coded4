@@ -133,9 +133,7 @@ def output_yaml(repo_name, contribs, totals):
         write_contrib(contrib)
 
     print >>result, "totals:"
-    totals = totals.copy()
-    totals.pop('name')
-    write_contrib(totals)
+    write_contrib(dict_without(totals, ['name']))
 
     result.seek(0)
     return result.read()
@@ -150,6 +148,29 @@ def output_plist(repo_name, contribs, totals):
         c['time'] = timedelta_to_str(c['time'])
 
     return plistlib.writePlistToString(res)
+
+
+def output_xml(repo_name, contribs, totals):
+    """Outputs the repository statistics in general XML format."""
+    from StringIO import StringIO
+    import xml.etree.ElementTree as ET
+
+    stats = ET.Element('statistics', attrib={'repo': repo_name})
+
+    def write_contrib(contrib, parent, tag='contributor'):
+        attrs = dict((key, str_(value)) for key, value in contrib.items())
+        ET.SubElement(parent, tag, attrs)
+
+    contributors = ET.SubElement(stats, 'contributors')
+    for contrib in contribs:
+        write_contrib(contrib, parent=contributors)
+    write_contrib(dict_without(totals, ['name']), parent=stats, tag='totals')
+
+    result = StringIO()
+    ET.ElementTree(stats).write(result, encoding='utf-8', xml_declaration=True)
+
+    result.seek(0)
+    return result.read()
 
 
 # Utilities
@@ -180,3 +201,13 @@ def timedelta_to_str(td):
     res += ":".join(parts)
 
     return res
+
+
+def dict_without(dict_, keys):
+    """Returns a dictionary without specified keys.
+    :raise KeyError: If any of the keys do not exist in the dictionary
+    """
+    dict_ = dict_.copy()
+    for key in keys:
+        dict_.pop(key)
+    return dict_
