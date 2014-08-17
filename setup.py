@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 """
 coded4
-Setup script
+======
+
+{description}
 """
 import ast
 import os
@@ -35,16 +37,47 @@ def read_tags(filename):
     return res
 
 
+def read_requirements(filename='requirements.txt'):
+    """Reads the list of requirements from given file.
+
+    :param filename: Filename to read the requirements from.
+                     Uses ``'requirements.txt'`` by default.
+
+    :return: Requirements as list of strings
+    """
+    # allow for some leeway with the argument
+    if not filename.startswith('requirements'):
+        filename = 'requirements-' + filename
+    if not os.path.splitext(filename)[1]:
+        filename += '.txt'  # no extension, add default
+
+    def valid_line(line):
+        line = line.strip()
+        return line and not any(line.startswith(p) for p in ('#', '-'))
+
+    def extract_requirement(line):
+        egg_eq = '#egg='
+        if egg_eq in line:
+            _, requirement = line.split(egg_eq, 1)
+            return requirement
+        return line
+
+    with open(filename) as f:
+        lines = f.readlines()
+        return list(map(extract_requirement, filter(valid_line, lines)))
+
+
 tags = read_tags(os.path.join('coded4', '__init__.py'))
+__doc__ = __doc__.format(**tags)
 
 
 setup(name="coded4",
-      version=tags['__version__'],
-      description="Time-based statistics for Git and Hg repositories",
-      author=tags['__author__'],
-      author_email="karol.kuczmarski@gmail.com",
+      version=tags['version'],
+      description=tags['description'],
+      long_description=__doc__,
+      author=tags['author'],
       url="http://github.com/Xion/coded4",
-      license=tags['__license__'],
+      license=tags['license'],
 
       classifiers=[
          'Development Status :: 4 - Beta',
@@ -56,6 +89,8 @@ setup(name="coded4",
          'Programming Language :: Python :: 2.7',
          'Topic :: Software Development',
       ],
+
+      install_requires=read_requirements(),
 
       packages=find_packages(),
       entry_points={
