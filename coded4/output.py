@@ -157,13 +157,13 @@ def output_xml(repo_name, contribs, totals):
 
     stats = ET.Element('statistics', attrib={'repo': repo_name})
 
-    def write_contrib(contrib, parent, tag='contributor'):
+    def write_contrib(contrib, parent, tag):
         attrs = dict((key, str_(value)) for key, value in contrib.items())
         ET.SubElement(parent, tag, attrs)
 
     contributors = ET.SubElement(stats, 'contributors')
     for contrib in contribs:
-        write_contrib(contrib, parent=contributors)
+        write_contrib(contrib, parent=contributors, tag='contributor')
     write_contrib(dict_without(totals, ['name']), parent=stats, tag='totals')
 
     result = StringIO()
@@ -171,6 +171,30 @@ def output_xml(repo_name, contribs, totals):
 
     result.seek(0)
     return result.read()
+
+
+def output_sexp(repo_name, contribs, totals):
+    """Output the repository statistics as an S-expression."""
+    from StringIO import StringIO
+
+    result = StringIO()
+    print >>result, '(repo "%s"' % repo_name
+
+    def write_contrib(contrib, tag, indent=0):
+        indent = ' ' * indent
+        print >>result, indent +'(%s %s)' % (tag, ' '.join(
+            '(%s "%s")' % item for item in contrib.items()))
+
+    for contrib in contribs:
+        write_contrib(contrib, tag='contributor', indent=1)
+    write_contrib(dict_without(totals, ['name']), tag='totals', indent=1)
+
+    # insert final closing parenthesis before the last newline
+    result.seek(-len(os.linesep), 1)
+    print >>result, ")"
+
+    result.seek(0)
+    return result.read()[:-len(os.linesep)]  # remove that last newline
 
 
 # Utilities

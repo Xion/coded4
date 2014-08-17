@@ -77,7 +77,7 @@ def create_argument_parser():
 
 
 DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
-OUTPUT_FORMATS = ['table', 'csv', 'json', 'yaml', 'plist', 'xml']
+OUTPUT_FORMATS = ['table', 'csv', 'json', 'yaml', 'plist', 'xml', 'sexp']
 CLUSTERING_ALGORITHMS = ['simple']
 APPROXIMATION_ALGORITHMS = {
     'null': "Null approximation (i.e. uses only time between commits), "
