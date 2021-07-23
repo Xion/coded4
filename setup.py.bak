@@ -64,7 +64,7 @@ def read_requirements(filename='requirements.txt'):
 
     with open(filename) as f:
         lines = f.readlines()
-        return list(map(extract_requirement, list(filter(valid_line, lines))))
+        return list(map(extract_requirement, filter(valid_line, lines)))
 
 
 tags = read_tags(os.path.join('coded4', '__init__.py'))

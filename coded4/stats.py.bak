@@ -51,7 +51,7 @@ def calculate_totals(contributors):
 
     sums = [initial for _, initial in measures]
     for c in contributors:
-        for i in range(0, len(measures)):
+        for i in xrange(0, len(measures)):
             attr, _ = measures[i]
             sums[i] += getattr(c, attr)
 

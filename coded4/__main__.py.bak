@@ -2,7 +2,7 @@
 """
 Executable script.
 """
-
+from __future__ import unicode_literals
 
 import argparse
 from datetime import datetime, timedelta
@@ -17,7 +17,7 @@ def main():
 
     if args:
         contributors = calculate_statistics(args)
-        print(format_output(args.directory, contributors, args.output))
+        print format_output(args.directory, contributors, args.output)
 
 
 def create_argument_parser():
