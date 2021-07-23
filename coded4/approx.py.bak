@@ -90,6 +90,6 @@ def commit_time_diff(commits):
         return []
 
     diffs = []
-    for i in range(0, len(commits) - 1):
+    for i in xrange(0, len(commits) - 1):
         diffs.append(commits[i].time - commits[i+1].time)
     return diffs
