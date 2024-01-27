@@ -1,21 +1,18 @@
-"""
-Code for supporting specific VCS (version control systems).
-"""
-from collections import namedtuple
-from datetime import  datetime
+"""Code for supporting specific VCS (version control systems)."""
 import os
+from collections import namedtuple
+from datetime import datetime
 
 from taipan.functional.functions import attr_func
 
 from coded4.utils import exec_command
 
-
-SUPPORTED_VCS = ['git', 'hg']
+SUPPORTED_VCS = ["git", "hg"]
 
 
 def retrieve_commit_history(directory, vcs_name=None, interval=None):
     """Retrieves history of commit for given repository.
-    :return: List of Commit tuples
+    :return: List of Commit tuples.
     """
     vcs_name = vcs_name or detect_vcs(directory)
     if not vcs_name:
@@ -24,37 +21,38 @@ def retrieve_commit_history(directory, vcs_name=None, interval=None):
 
     interval = interval or (None, None)
 
-    history_func = globals().get(vcs_name + '_history')
+    history_func = globals().get(vcs_name + "_history")
     if not history_func:
         raise ValueError(
             "Version control system '%s' is not supported" % vcs_name)
 
     history = history_func(directory, interval)
-    return sorted(history, key=attr_func('time'), reverse=True)
+    return sorted(history, key=attr_func("time"), reverse=True)
 
 
 def detect_vcs(directory):
     """Checks which of the supported VCS has repo in given directory.
-    :return: Name of version control system found in given directory
+    :return: Name of version control system found in given directory.
     """
     for vcs in SUPPORTED_VCS:
-        vcs_dir = os.path.join(directory, '.' + vcs)
+        vcs_dir = os.path.join(directory, "." + vcs)
         if os.path.isdir(vcs_dir):
             return vcs
+    return None
 
 
-Commit = namedtuple('Commit', ['hash', 'time', 'author', 'message'])
+Commit = namedtuple("Commit", ["hash", "time", "author", "message"])
 
 
-### Git support
+# Git support
 
-GIT_TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
+GIT_TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 
 def git_history(path, interval):
-    """Returns a list of Commit tuples with history for given Git repo. """
-    sep = '|'
-    git_log_format = sep.join(['%H', '%at', '%an', '%s'])
+    """Returns a list of Commit tuples with history for given Git repo."""
+    sep = "|"
+    git_log_format = sep.join(["%H", "%at", "%an", "%s"])
     git_log = 'git log --format=format:"%s"' % git_log_format
 
     since, until = interval
@@ -74,30 +72,29 @@ def git_history(path, interval):
     return history
 
 
-### Hg support
+# Hg support
 
-HG_TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
+HG_TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 
 def hg_history(path, interval):
     """Returns a list of Commit tuples with history
     for given Mercurial repo.
     """
-    sep = '|'
-    hg_log_template = sep.join(['{node}', '{date|hgdate}',
-                                '{author|person}', '{desc|firstline}'])
+    sep = "|"
+    hg_log_template = sep.join(["{node}", "{date|hgdate}",
+                                "{author|person}", "{desc|firstline}"])
     hg_log = r'hg log --template "%s\n"' % hg_log_template
 
     # add date filter if interval is specified
     date_filter = None
     since, until = interval
     if since and until:
-        date_filter = '%s to %s' % (since.strftime(HG_TIME_FORMAT),
-                                    until.strftime(HG_TIME_FORMAT))
+        date_filter = f"{since.strftime(HG_TIME_FORMAT)} to {until.strftime(HG_TIME_FORMAT)}"
     elif since:
-        date_filter = '>' + since.strftime(HG_TIME_FORMAT)
+        date_filter = ">" + since.strftime(HG_TIME_FORMAT)
     elif until:
-        date_filter = '<' + until.strftime(HG_TIME_FORMAT)
+        date_filter = "<" + until.strftime(HG_TIME_FORMAT)
     if date_filter:
         hg_log += ' --date "%s"' % date_filter
 
@@ -106,7 +103,7 @@ def hg_history(path, interval):
     history = []
     for line in log.splitlines():
         commit_hash, hg_time, author, message = line.split(sep, 3)
-        hg_time = sum(map(int, hg_time.split()), 0)  # hg_time is 'local_timestamp timezone_offset'
+        hg_time = sum(list(map(int, hg_time.split())), 0)  # hg_time is 'local_timestamp timezone_offset'
         time = datetime.fromtimestamp(hg_time)
         history.append(Commit(commit_hash, time, author, message))
 

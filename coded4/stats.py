@@ -1,6 +1,4 @@
-"""
-Code for calculating statistics based on commit history.
-"""
+"""Code for calculating statistics based on commit history."""
 from collections import namedtuple
 from datetime import timedelta
 from itertools import chain, starmap
@@ -8,8 +6,8 @@ from itertools import chain, starmap
 from taipan.collections import dicts
 
 
-class Contributor(namedtuple('Contributor',
-                             ['name', 'sessions', 'total_time'])):
+class Contributor(namedtuple("Contributor",
+                             ["name", "sessions", "total_time"])):
     """Represents a single contributor to the repository."""
 
     @property
@@ -45,13 +43,13 @@ def calculate_totals(contributors):
              or None
     """
     if not contributors:
-        return
+        return None
 
-    measures = [('sessions', []), ('total_time', timedelta())]
+    measures = [("sessions", []), ("total_time", timedelta())]
 
     sums = [initial for _, initial in measures]
     for c in contributors:
-        for i in xrange(0, len(measures)):
+        for i in range(len(measures)):
             attr, _ = measures[i]
             sums[i] += getattr(c, attr)
 
