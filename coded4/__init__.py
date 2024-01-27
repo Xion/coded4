@@ -1,6 +1,4 @@
-"""
-coded4
-"""
+"""coded4."""
 __description__ = "Time-based statistics for Git and Hg repositories"
 __author__ = 'Karol Kuczmarski "Xion"'
 __license__ = "MIT"

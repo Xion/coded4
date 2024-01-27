@@ -1,6 +1,4 @@
-"""
-Algorithms for approximating coding sessions
-"""
+"""Algorithms for approximating coding sessions."""
 from collections import namedtuple
 from datetime import timedelta
 
@@ -8,13 +6,14 @@ from taipan.collections import dicts
 from taipan.functional.combinators import curry
 
 
-class Session(namedtuple('Session',
-                         ['commits', 'time_before_first', 'time_after_last'])):
+class Session(namedtuple("Session",
+                         ["commits", "time_before_first", "time_after_last"])):
     """Represents a single coding session.
 
     Session consists of commits, plus some approximated time before the first
     and after last commit.
     """
+
     @property
     def total_time(self):
         total = self.time_before_first + self.time_after_last
@@ -32,14 +31,13 @@ def approximate_coding_sessions(clustered_commits, approx_algo):
 
     :return: Dictionary mapping contributor names to lists of Session tuples
     """
-    approx_func = globals().get(approx_algo + '_approximation')
+    approx_func = globals().get(approx_algo + "_approximation")
     if not approx_func:
         raise ValueError("Unknown approximation '%s'" % approx_algo)
+    return dicts.mapvalues(curry(lambda f, i: list(map(f, i)), approx_func), clustered_commits)
 
-    return dicts.mapvalues(curry(map, approx_func), clustered_commits)
 
-
-## Algorithms
+# Algorithms
 
 SINGLE_COMMIT_TIMES = timedelta(minutes=5), timedelta()
 
@@ -82,14 +80,10 @@ def quarter_end_approximation(commit_cluster):
     return Session(commit_cluster, *SINGLE_COMMIT_TIMES)
 
 
-## Utilities
+# Utilities
 
 def commit_time_diff(commits):
-    """Returns time differences between commits. """
+    """Returns time differences between commits."""
     if not commits or len(commits) == 1:
         return []
-
-    diffs = []
-    for i in xrange(0, len(commits) - 1):
-        diffs.append(commits[i].time - commits[i+1].time)
-    return diffs
+    return [commits[i].time - commits[i + 1].time for i in range(len(commits) - 1)]

@@ -1,6 +1,4 @@
-"""
-Algorithms for clustering commits
-"""
+"""Algorithms for clustering commits."""
 from taipan.collections import dicts
 from taipan.functional.combinators import curry
 
@@ -8,7 +6,7 @@ from taipan.functional.combinators import curry
 def group_by_contributors(commit_history):
     """Goes through commit history and groups commits by their authors.
     :param commit_history: List of Commit tuples
-    :return: Dictionary mapping author names to lists of Commit tuples
+    :return: Dictionary mapping author names to lists of Commit tuples.
     """
     commits = {}
     for commit in commit_history:
@@ -28,7 +26,7 @@ def cluster_commits(grouped_commits, cluster_algo, epsilon):
 
     :return: Dictionary mapping author names to lists of coding sessions
     """
-    cluster_func = globals().get(cluster_algo + '_clustering')
+    cluster_func = globals().get(cluster_algo + "_clustering")
     if not cluster_func:
         raise ValueError("Unknown clustering algorithm '%s'" % cluster_algo)
 
@@ -36,7 +34,7 @@ def cluster_commits(grouped_commits, cluster_algo, epsilon):
                            grouped_commits)
 
 
-## Algorithms
+# Algorithms
 
 def simple_clustering(commits, epsilon):
     """Divides list of commits into clusters (coding sessions)
@@ -56,8 +54,7 @@ def simple_clustering(commits, epsilon):
             session = []
         session.append(commit)
         last_commit_time = commit.time
-    else:
-        if session:
-            sessions.append(session)
+    if session:
+        sessions.append(session)
 
     return sessions
